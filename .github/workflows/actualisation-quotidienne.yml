@@ -1,0 +1,70 @@
+name: Actualisation quotidienne des sources sanitaires
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Récupérer le site
+        uses: actions/checkout@v4
+
+      - name: Actualiser les flux publics
+        shell: pwsh
+        env:
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+        run: ./scripts/refresh-daily-data.ps1
+
+      - name: Publier les nouvelles données
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git add data/daily-updates.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m "chore: refresh daily health sources"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            git push
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } elseif ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Preparer les fichiers du site
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "_site" | Out-Null
+          Copy-Item -Path "index.html", "styles.css", "app.js" -Destination "_site"
+          Copy-Item -Path "data" -Destination "_site\data" -Recurse
+
+      - name: Televerser le site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publier sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

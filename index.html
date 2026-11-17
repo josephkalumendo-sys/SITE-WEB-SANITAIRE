@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f4">
+    <title>Veille sanitaire — RD Congo</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell" id="app-shell">
+      <aside class="app-sidebar" id="app-sidebar" aria-label="Navigation de l’application">
+        <a class="brand" href="#accueil" aria-label="Veille sanitaire, accueil">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <span>Veille<span class="brand-light"> sanitaire</span></span>
+        </a>
+        <p class="sidebar-caption">SURVEILLANCE SANITAIRE</p>
+        <nav class="app-nav" aria-label="Sections principales">
+          <a class="app-nav-link is-active" href="#accueil" aria-current="page"><span class="nav-number">01</span>Accueil</a>
+          <a class="app-nav-link" href="#actualites"><span class="nav-number">02</span>Actualités sanitaires</a>
+          <a class="app-nav-link" href="#epidemies"><span class="nav-number">03</span>Épidémies et alertes</a>
+          <a class="app-nav-link" href="#innovations"><span class="nav-number">04</span>Innovations numériques en santé</a>
+          <a class="app-nav-link" href="#campagnes"><span class="nav-number">05</span>Campagne de sensibilisation</a>
+          <a class="app-nav-link" href="#verification"><span class="nav-number">06</span>Rumeurs et vérification</a>
+          <a class="app-nav-link" href="#ressources"><span class="nav-number">07</span>Ressources et rapports</a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="country-dot"></span>
+          <span>République démocratique<br>du Congo</span>
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="topbar">
+          <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Ouvrir la navigation" aria-controls="app-sidebar" aria-expanded="false">
+            <span aria-hidden="true">☰</span>
+          </button>
+          <span class="topbar-title">Tableau de bord sanitaire</span>
+          <span class="country-tag"><span class="country-dot"></span> RD Congo</span>
+        </header>
+
+        <main id="main-content">
+      <section class="app-section" id="accueil" aria-labelledby="home-title">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">Surveillance des sources publiques</p>
+          <h1 id="home-title">Veille sanitaire<br><span>en RDC</span></h1>
+          <p class="intro-copy">Suivez les alertes, consultez la carte par province et accédez aux informations sanitaires sourcées.</p>
+        </div>
+        <div class="demo-label"><span aria-hidden="true">●</span> Données provisoires officielles</div>
+      </section>
+
+      <section class="notice" aria-label="Précision importante">
+        <span class="notice-icon" aria-hidden="true">i</span>
+        <p><strong>À retenir</strong> — Une publication médiatique n’est pas une confirmation officielle d’épidémie. Seules les autorités sanitaires compétentes peuvent confirmer une situation épidémique.</p>
+      </section>
+
+      <section class="national-summary" aria-labelledby="summary-title">
+        <div class="summary-heading">
+          <div>
+            <p class="eyebrow">Point de situation national</p>
+            <h2 id="summary-title">Maladie à virus Bundibugyo (Ebola)</h2>
+          </div>
+          <span class="summary-date">OMS · 15 novembre 2026</span>
+        </div>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <strong>+11 000</strong>
+            <span>cas signalés depuis le début</span>
+          </div>
+          <div class="summary-stat">
+            <strong>5 400</strong>
+            <span>décès signalés</span>
+          </div>
+          <div class="summary-stat">
+            <strong>67 zones</strong>
+            <span>dans 8 provinces</span>
+          </div>
+          <div class="summary-stat">
+            <strong>400–500</strong>
+            <span>nouveaux cas signalés par semaine</span>
+          </div>
+        </div>
+        <p class="summary-note">L’OMS rapporte aussi près de 3 000 personnes guéries, 104 centres de traitement et de transit comptant près de 2 000 lits, et des enterrements sécurisés pour environ 90 % des décès signalés. Ces chiffres décrivent la riposte au 15/11/2026, pas une situation en temps réel. <a href="https://www.afro.who.int/fr/countries/democratic-republic-of-congo/news/six-mois-apres-il-est-essentiel-datteindre-les-communautes-difficiles-dacces-pour-contenir-lepidemie" target="_blank" rel="noopener noreferrer">Lire le point de situation OMS ↗</a></p>
+      </section>
+      </section>
+
+      <section class="app-section" id="actualites" aria-labelledby="news-title">
+        <div class="page-heading">
+          <p class="eyebrow">Suivi géographique</p>
+          <h2 id="news-title">Actualités sanitaires</h2>
+          <p>Consultez les informations disponibles et sélectionnez une zone pour afficher ses sources.</p>
+        </div>
+      <section class="workspace" aria-label="Carte et informations par province">
+        <div class="map-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Carte interactive</p>
+              <h2>Choisir une province</h2>
+            </div>
+            <span class="map-count" id="province-count">Chargement…</span>
+          </div>
+          <p class="map-instruction">Cliquez sur une province ou un repère pour zoomer; utilisez +/− ou Vue complète pour régler l’affichage.</p>
+          <div class="map-controls" role="group" aria-label="Commandes de zoom de la carte">
+            <button class="map-zoom-button" id="map-zoom-in" type="button" aria-label="Zoomer sur la carte" title="Zoomer">+</button>
+            <button class="map-zoom-button" id="map-zoom-out" type="button" aria-label="Dézoomer sur la carte" title="Dézoomer">−</button>
+            <button class="map-fit-button" id="map-fit" type="button" aria-label="Afficher toute la carte">Vue complète</button>
+            <span class="map-zoom-level" id="map-zoom-level" aria-live="polite">100 %</span>
+          </div>
+          <div class="map-frame">
+            <svg id="province-map" viewBox="0 0 820 740" role="group" aria-label="Carte des provinces de la République démocratique du Congo"></svg>
+            <div class="map-error" id="map-error" role="alert" hidden>
+              <strong>La carte n’a pas pu être chargée.</strong>
+              <span>Vérifiez que le fichier de données des provinces est présent dans le dossier data.</span>
+            </div>
+          </div>
+          <div class="map-legend">
+            <span class="legend-swatch legend-confirmed"></span> Province avec confirmation officielle
+            <span class="legend-swatch legend-city-active"></span> Transmission signalée en ville
+            <span class="legend-swatch legend-city-controlled"></span> Épicentre initial contrôlé
+            <span class="legend-swatch legend-city-community"></span> Action communautaire rapportée
+            <span class="legend-swatch legend-city-access"></span> Accès à la riposte entravé
+            <span class="legend-swatch legend-city-indicator"></span> Indicateur VIH provincial, non spécifique à la ville
+            <span class="legend-swatch legend-alert"></span> Alerte officielle
+            <span class="legend-separator">·</span>
+            <span id="selected-legend">Aucune sélection</span>
+          </div>
+          <div class="province-list-wrap">
+            <h3>Provinces</h3>
+            <div class="province-list" id="province-list" aria-label="Liste des provinces"></div>
+          </div>
+          <p class="map-attribution">Contours et coordonnées des localités : <a href="https://www.geoboundaries.org/" target="_blank" rel="noopener noreferrer">geoBoundaries</a> et <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap (ODbL)</a>. Situations épidémiques : OMS Afrique, publications du 28/10 au 15/11/2026. Indicateur VIH du Lualaba : <a href="https://phia.icap.columbia.edu/wp-content/uploads/2026/05/CODPHIA-SS-French_V4.pdf" target="_blank" rel="noopener noreferrer">CODPHIA 2024</a>.</p>
+        </div>
+
+        <aside class="detail-card" aria-live="polite" aria-labelledby="detail-title">
+          <div class="detail-top">
+            <p class="eyebrow">Zone sélectionnée</p>
+            <span class="demo-chip">PAR PROVINCE</span>
+          </div>
+          <h2 id="detail-title">Choisissez une province</h2>
+          <p class="detail-copy" id="detail-copy">Les informations disponibles pour la zone choisie apparaîtront ici.</p>
+          <div class="detail-divider"></div>
+
+          <div class="api-settings" id="api-settings">
+            <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false">
+              <span>Configurer les flux médiatiques</span>
+              <span aria-hidden="true">+</span>
+            </button>
+            <form class="settings-form" id="settings-form" hidden>
+              <label for="gnews-key">Clé GNews</label>
+              <input id="gnews-key" type="password" autocomplete="off" placeholder="Votre clé GNews">
+              <label for="newsdata-key">Clé NewsData.io</label>
+              <input id="newsdata-key" type="password" autocomplete="off" placeholder="Votre clé NewsData.io">
+              <p>Les clés sont conservées seulement dans cette session du navigateur. Elles restent visibles côté client ; pour un déploiement public, utilisez un serveur proxy sécurisé.</p>
+              <button type="submit">Activer les recherches</button>
+            </form>
+          </div>
+
+          <div class="empty-state" id="empty-state">
+            <span class="empty-icon" aria-hidden="true">↗</span>
+            <h3>Aucune zone chargée</h3>
+            <p>Sélectionnez une province pour rechercher les publications disponibles.</p>
+            <p class="required-fields">Chaque article doit afficher sa <strong>source</strong>, sa <strong>date de publication</strong> et son caractère médiatique non confirmatoire.</p>
+          </div>
+          <div class="news-results" id="news-results" aria-live="polite" hidden></div>
+
+        </aside>
+      </section>
+      <section class="daily-news" aria-labelledby="daily-news-title">
+        <div class="daily-news-heading">
+          <div>
+            <p class="eyebrow">Veille actualisée automatiquement</p>
+            <h3 id="daily-news-title">Publications sanitaires récentes</h3>
+          </div>
+          <p class="daily-update-status" id="daily-update-status" aria-live="polite">Chargement des dernières publications…</p>
+        </div>
+        <p class="daily-news-note">Sources officielles, humanitaires et médiatiques. Les articles médiatiques et humanitaires ne confirment pas une épidémie; les couleurs et statuts de la carte ne changent qu’après vérification officielle.</p>
+        <p class="daily-source-status" id="daily-source-status"></p>
+        <div class="daily-news-grid" id="daily-news-feed" aria-live="polite"></div>
+      </section>
+      </section>
+
+      <section class="app-section" id="epidemies" aria-labelledby="outbreak-title">
+        <div class="page-heading">
+          <p class="eyebrow">Surveillance officielle</p>
+          <h2 id="outbreak-title">Épidémies et alertes</h2>
+          <p>Les statuts et dates ci-dessous proviennent des publications citées; une alerte n’équivaut pas à une confirmation.</p>
+        </div>
+        <div class="outbreak-grid" id="outbreak-list" aria-live="polite"></div>
+      </section>
+
+      <section class="app-section" id="innovations" aria-labelledby="innovation-title">
+        <div class="page-heading">
+          <p class="eyebrow">Outils et pratiques</p>
+          <h2 id="innovation-title">Innovations numériques en santé</h2>
+          <p>Des usages numériques qui peuvent soutenir la veille sanitaire, sous réserve de disponibilité locale et de protection des données.</p>
+        </div>
+        <div class="info-grid">
+          <article class="info-card">
+            <span class="card-icon" aria-hidden="true">01</span>
+            <h3>Surveillance et données</h3>
+            <p>Les systèmes d’information sanitaire aident les équipes à organiser les signalements, suivre les tendances et partager des données agrégées.</p>
+            <a href="https://dhis2.org/" target="_blank" rel="noopener noreferrer">Découvrir DHIS2 ↗</a>
+            <small>Source : DHIS2 · page institutionnelle, date de publication non précisée · consultée le 17/11/2026.</small>
+          </article>
+          <article class="info-card">
+            <span class="card-icon" aria-hidden="true">02</span>
+            <h3>Télésanté et accès</h3>
+            <p>La santé numérique peut faciliter l’accès à l’information et aux services, en complément des soins et des équipes de santé locales.</p>
+            <a href="https://www.who.int/publications/i/item/9789240020924" target="_blank" rel="noopener noreferrer">Stratégie mondiale de l’OMS ↗</a>
+            <small>Source : OMS · stratégie 2020–2025 publiée en 2021.</small>
+          </article>
+          <article class="info-card">
+            <span class="card-icon" aria-hidden="true">03</span>
+            <h3>Cartographie interactive</h3>
+            <p>Cette carte permet d’explorer les provinces et localités et de consulter la source, la date et le statut associés aux informations affichées.</p>
+            <a href="#actualites">Ouvrir la carte ↗</a>
+            <small>Les repères ne remplacent pas les consignes des autorités sanitaires.</small>
+          </article>
+          <article class="info-card info-card-note">
+            <span class="card-icon" aria-hidden="true">!</span>
+            <h3>Protection des données</h3>
+            <p>Ne publiez pas de noms, diagnostics ou coordonnées de patients. Privilégiez les indicateurs agrégés et les canaux officiels.</p>
+            <a href="https://www.who.int/teams/digital-health-and-innovation" target="_blank" rel="noopener noreferrer">OMS — santé numérique ↗</a>
+            <small>Référence institutionnelle · date de publication non précisée · consultée le 17/11/2026.</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="app-section" id="campagnes" aria-labelledby="campaign-title">
+        <div class="page-heading">
+          <p class="eyebrow">Information à partager</p>
+          <h2 id="campaign-title">Campagne de sensibilisation</h2>
+          <p>Relayez les messages avec leur source et leur périmètre; vérifiez la date avant toute diffusion.</p>
+        </div>
+        <div class="campaign-grid">
+          <article class="campaign-card campaign-ebola">
+            <span class="campaign-tag">Bundibugyo · Ituri</span>
+            <h3>Partager les consignes à jour</h3>
+            <p>Invitez les communautés à consulter les bulletins sanitaires et les consignes des autorités locales. Le point OMS cité concerne la situation au 15 novembre 2026.</p>
+            <a href="https://www.afro.who.int/fr/countries/democratic-republic-of-congo/news/six-mois-apres-il-est-essentiel-datteindre-les-communautes-difficiles-dacces-pour-contenir-lepidemie" target="_blank" rel="noopener noreferrer">OMS Afrique · publié le 15/11/2026 ↗</a>
+          </article>
+          <article class="campaign-card campaign-hiv">
+            <span class="campaign-tag">VIH · Lualaba</span>
+            <h3>Ne pas confondre province et ville</h3>
+            <p>La prévalence CODPHIA de 2,3 % concerne les adultes du Lualaba et les données de l’enquête 2024; ce n’est pas un taux spécifique à Kolwezi.</p>
+            <a href="https://phia.icap.columbia.edu/wp-content/uploads/2026/05/CODPHIA-SS-French_V4.pdf" target="_blank" rel="noopener noreferrer">CODPHIA 2024 · résultats publiés en juin 2026 ↗</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="app-section" id="verification" aria-labelledby="verification-title">
+        <div class="page-heading">
+          <p class="eyebrow">Information fiable</p>
+          <h2 id="verification-title">Rumeurs et vérification</h2>
+          <p>Une publication médiatique ou un message viral ne confirme pas à lui seul une épidémie.</p>
+        </div>
+        <div class="verification-layout">
+          <article class="verification-card">
+            <h3>Grille de vérification</h3>
+            <ol>
+              <li><strong>Source :</strong> l’auteur est-il une autorité sanitaire ou une organisation identifiée?</li>
+              <li><strong>Date :</strong> la publication est-elle récente et toujours valable?</li>
+              <li><strong>Lieu :</strong> la ville, la zone de santé et la province sont-elles précisées?</li>
+              <li><strong>Confirmation :</strong> une source officielle confirme-t-elle les cas ou l’alerte?</li>
+            </ol>
+            <p class="verification-warning">En cas de doute, ne partagez pas de données personnelles et attendez une publication officielle.</p>
+          </article>
+          <article class="verification-card source-check-card">
+            <h3>Comparer avec des sources reconnues</h3>
+            <a href="https://www.who.int/countries/cod" target="_blank" rel="noopener noreferrer">OMS — RDC ↗</a>
+            <a href="https://sante.gouv.cd/" target="_blank" rel="noopener noreferrer">Ministère de la Santé ↗</a>
+            <a href="https://reliefweb.int/country/cod" target="_blank" rel="noopener noreferrer">ReliefWeb — RDC ↗</a>
+            <p>Cette rubrique fournit une méthode de vérification; elle ne valide pas automatiquement les contenus soumis ou partagés ailleurs.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="app-section" id="ressources" aria-labelledby="resource-title">
+        <div class="page-heading">
+          <p class="eyebrow">Références et publications</p>
+          <h2 id="resource-title">Ressources et rapports</h2>
+          <p>Consultez toujours la publication d’origine pour sa date, sa zone de couverture et ses mises à jour.</p>
+        </div>
+        <div class="resource-grid">
+          <article class="resource-card">
+            <h3>Sources officielles</h3>
+            <a href="https://www.who.int/countries/cod" target="_blank" rel="noopener noreferrer">Organisation mondiale de la Santé (OMS) ↗</a>
+            <a href="https://sante.gouv.cd/" target="_blank" rel="noopener noreferrer">Ministère de la Santé (RDC) ↗</a>
+            <a href="https://africacdc.org/" target="_blank" rel="noopener noreferrer">Africa CDC ↗</a>
+            <a href="https://www.cdc.gov/outbreaks/" target="_blank" rel="noopener noreferrer">CDC — alertes sanitaires ↗</a>
+            <a href="https://www.ecdc.europa.eu/en" target="_blank" rel="noopener noreferrer">ECDC ↗</a>
+            <a href="https://www.unaids.org/en/regionscountries/countries/democraticrepublicofthecongo" target="_blank" rel="noopener noreferrer">ONUSIDA — RDC ↗</a>
+          </article>
+          <article class="resource-card">
+            <h3>Sources humanitaires</h3>
+            <a href="https://reliefweb.int/country/cod" target="_blank" rel="noopener noreferrer">ReliefWeb — RDC ↗</a>
+            <a href="https://www.unicef.org/drcongo/" target="_blank" rel="noopener noreferrer">UNICEF — RDC ↗</a>
+          </article>
+          <article class="resource-card">
+            <h3>Rapports cités dans la carte</h3>
+            <a href="https://www.afro.who.int/fr/countries/democratic-republic-of-congo/news/six-mois-apres-il-est-essentiel-datteindre-les-communautes-difficiles-dacces-pour-contenir-lepidemie" target="_blank" rel="noopener noreferrer">OMS Afrique — Bundibugyo, 15/11/2026 ↗</a>
+            <a href="https://phia.icap.columbia.edu/wp-content/uploads/2026/05/CODPHIA-SS-French_V4.pdf" target="_blank" rel="noopener noreferrer">CODPHIA 2024 — Lualaba, résultats publiés en juin 2026 ↗</a>
+          </article>
+          <article class="resource-card">
+            <h3>Médias à vérifier</h3>
+            <a href="https://gnews.io/" target="_blank" rel="noopener noreferrer">GNews ↗</a>
+            <a href="https://newsdata.io/" target="_blank" rel="noopener noreferrer">NewsData.io ↗</a>
+            <p>Les articles médiatiques sont des pistes à vérifier, pas des confirmations officielles d’épidémie.</p>
+          </article>
+        </div>
+      </section>
+        </main>
+
+        <footer>
+          <span>Veille sanitaire · RD Congo</span>
+          <span>Veille publique — vérifiez toujours les publications auprès de leur source officielle.</span>
+        </footer>
+      </div>
+    </div>
+    <button class="nav-backdrop" id="nav-backdrop" type="button" aria-label="Fermer la navigation" hidden></button>
+
+    <script src="data/provinces-rdc.js"></script>
+    <script src="data/health-data.js"></script>
+    <script src="data/city-health-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

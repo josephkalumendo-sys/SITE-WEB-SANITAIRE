@@ -1,0 +1,847 @@
+const provinceNames = {
+  "Central Kasai": "Kasaï-Central",
+  "Kasai": "Kasaï",
+  "Kasai-Oriental": "Kasaï-Oriental",
+  "Kongo-Central": "Kongo-Central",
+  "Lower Uele": "Bas-Uele",
+  "North Kivu": "Nord-Kivu",
+  "South Kivu": "Sud-Kivu",
+  "Upper Uele": "Haut-Uele"
+};
+
+const map = document.getElementById("province-map");
+const provinceList = document.getElementById("province-list");
+const mapCount = document.getElementById("province-count");
+const mapError = document.getElementById("map-error");
+const mapZoomIn = document.getElementById("map-zoom-in");
+const mapZoomOut = document.getElementById("map-zoom-out");
+const mapFit = document.getElementById("map-fit");
+const mapZoomLevel = document.getElementById("map-zoom-level");
+const appShell = document.getElementById("app-shell");
+const navToggle = document.getElementById("nav-toggle");
+const navBackdrop = document.getElementById("nav-backdrop");
+const navLinks = [...document.querySelectorAll(".app-nav-link")];
+const outbreakList = document.getElementById("outbreak-list");
+const detailTitle = document.getElementById("detail-title");
+const detailCopy = document.getElementById("detail-copy");
+const selectedLegend = document.getElementById("selected-legend");
+const newsResults = document.getElementById("news-results");
+const dailyNewsFeed = document.getElementById("daily-news-feed");
+const dailyUpdateStatus = document.getElementById("daily-update-status");
+const dailySourceStatus = document.getElementById("daily-source-status");
+const emptyState = document.getElementById("empty-state");
+const settingsToggle = document.getElementById("settings-toggle");
+const settingsForm = document.getElementById("settings-form");
+let selectedFeatureId = null;
+const MAP_VIEWBOX = { x: 0, y: 0, width: 820, height: 740 };
+const MAP_ASPECT_RATIO = MAP_VIEWBOX.width / MAP_VIEWBOX.height;
+let currentMapViewBox = { ...MAP_VIEWBOX };
+
+function updateMapViewBox(viewBox) {
+  const width = Math.min(MAP_VIEWBOX.width, Math.max(MAP_VIEWBOX.width / 6, viewBox.width));
+  const height = width / MAP_ASPECT_RATIO;
+  const x = Math.max(0, Math.min(MAP_VIEWBOX.width - width, viewBox.x));
+  const y = Math.max(0, Math.min(MAP_VIEWBOX.height - height, viewBox.y));
+  currentMapViewBox = { x, y, width, height };
+  map.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
+  mapZoomLevel.textContent = `${Math.round((MAP_VIEWBOX.width / width) * 100)} %`;
+}
+
+function zoomMap(factor) {
+  const width = Math.min(
+    MAP_VIEWBOX.width,
+    Math.max(MAP_VIEWBOX.width / 6, currentMapViewBox.width * factor)
+  );
+  const height = width / MAP_ASPECT_RATIO;
+  const centerX = currentMapViewBox.x + currentMapViewBox.width / 2;
+  const centerY = currentMapViewBox.y + currentMapViewBox.height / 2;
+  updateMapViewBox({
+    x: centerX - width / 2,
+    y: centerY - height / 2,
+    width
+  });
+}
+
+function zoomMapToBounds(bounds) {
+  const padding = 1.35;
+  const width = Math.min(
+    MAP_VIEWBOX.width,
+    Math.max(
+      MAP_VIEWBOX.width / 6,
+      bounds.width * padding,
+      bounds.height * MAP_ASPECT_RATIO * padding
+    )
+  );
+  const height = width / MAP_ASPECT_RATIO;
+  const centerX = bounds.x + bounds.width / 2;
+  const centerY = bounds.y + bounds.height / 2;
+  updateMapViewBox({
+    x: centerX - width / 2,
+    y: centerY - height / 2,
+    width
+  });
+}
+
+function zoomMapToPoint(x, y) {
+  const width = MAP_VIEWBOX.width / 4;
+  const height = width / MAP_ASPECT_RATIO;
+  updateMapViewBox({
+    x: x - width / 2,
+    y: y - height / 2,
+    width
+  });
+}
+
+mapZoomIn.addEventListener("click", () => zoomMap(1 / 1.3));
+mapZoomOut.addEventListener("click", () => zoomMap(1.3));
+mapFit.addEventListener("click", () => updateMapViewBox(MAP_VIEWBOX));
+
+function setNavigationOpen(isOpen) {
+  appShell.classList.toggle("nav-open", isOpen);
+  navToggle.setAttribute("aria-expanded", String(isOpen));
+  navToggle.setAttribute("aria-label", isOpen ? "Fermer la navigation" : "Ouvrir la navigation");
+  navBackdrop.hidden = !isOpen;
+}
+
+navToggle.addEventListener("click", () => {
+  setNavigationOpen(navToggle.getAttribute("aria-expanded") !== "true");
+});
+navBackdrop.addEventListener("click", () => setNavigationOpen(false));
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    navLinks.forEach((item) => {
+      const active = item === link;
+      item.classList.toggle("is-active", active);
+      if (active) item.setAttribute("aria-current", "page");
+      else item.removeAttribute("aria-current");
+    });
+    setNavigationOpen(false);
+  });
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && appShell.classList.contains("nav-open")) {
+    setNavigationOpen(false);
+    navToggle.focus();
+  }
+});
+
+if ("IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible) return;
+    navLinks.forEach((link) => {
+      const active = link.hash === `#${visible.target.id}`;
+      link.classList.toggle("is-active", active);
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }, { rootMargin: "-15% 0px -70% 0px", threshold: [0, 0.1, 0.3] });
+  document.querySelectorAll(".app-section").forEach((section) => sectionObserver.observe(section));
+}
+
+function getOfficialRecords(feature) {
+  const name = getProvinceName(feature);
+  const records = Array.isArray(window.RDC_HEALTH_DATA)
+    ? window.RDC_HEALTH_DATA
+    : [];
+  return records.filter((record) =>
+    provinceNames[record.province] === name ||
+    record.province === name ||
+    record.provinceAliases?.includes(name)
+  );
+}
+
+function applyOfficialMapStatus() {
+  if (!window.RDC_HEALTH_DATA) return;
+  map.querySelectorAll(".province-shape").forEach((shape) => {
+    const feature = window.RDC_PROVINCES.features.find(
+      (item) => item.properties.shapeID === shape.dataset.featureId
+    );
+    if (!feature) return;
+    const records = getOfficialRecords(feature);
+    const hasConfirmed = records.some((record) => record.status === "confirmed");
+    const hasAlert = records.some((record) => record.status === "alert");
+    shape.classList.toggle("is-confirmed", hasConfirmed);
+    shape.classList.toggle("is-alert", !hasConfirmed && hasAlert);
+    shape.style.fill = hasConfirmed ? "#b83b3b" : (hasAlert ? "#d59b42" : "");
+    if (hasConfirmed) {
+      shape.setAttribute("fill", "#b83b3b");
+    } else if (hasAlert) {
+      shape.setAttribute("fill", "#d59b42");
+    } else {
+      shape.removeAttribute("fill");
+    }
+  });
+}
+
+function createOfficialCard(feature) {
+  const records = getOfficialRecords(feature);
+  if (!records.length) return null;
+  const card = document.createElement("article");
+  card.className = "news-source";
+  const heading = document.createElement("h4");
+  heading.textContent = "Informations officielles";
+  card.appendChild(heading);
+
+  records.forEach((record) => {
+    const link = document.createElement("a");
+    link.href = record.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    const statusText = record.status === "confirmed"
+      ? "épidémie confirmée"
+      : record.status === "alert"
+        ? "alerte officielle à vérifier"
+        : "situation historique";
+    link.textContent = `${record.disease} — ${statusText}`;
+    const meta = document.createElement("p");
+    meta.className = "news-meta";
+    meta.textContent = `Source : ${record.source} · Publication : ${formatPublicationDate(record.date)} · Catégorie : officielle · ${record.provisional ? "PROVISOIRE" : "vérifiée"}`;
+    card.appendChild(link);
+    card.appendChild(meta);
+    if (record.note) {
+      const note = document.createElement("p");
+      note.className = "news-meta";
+      note.textContent = record.note;
+      card.appendChild(note);
+    }
+  });
+  return card;
+}
+
+settingsToggle.addEventListener("click", () => {
+  const expanded = settingsToggle.getAttribute("aria-expanded") === "true";
+  settingsToggle.setAttribute("aria-expanded", String(!expanded));
+  settingsToggle.querySelector("span:last-child").textContent = expanded ? "+" : "−";
+  settingsForm.hidden = expanded;
+});
+
+["gnews-key", "newsdata-key"].forEach((id) => {
+  const saved = sessionStorage.getItem(id);
+  if (saved) {
+    document.getElementById(id).value = saved;
+  }
+});
+
+settingsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sessionStorage.setItem("gnews-key", document.getElementById("gnews-key").value.trim());
+  sessionStorage.setItem("newsdata-key", document.getElementById("newsdata-key").value.trim());
+  settingsToggle.setAttribute("aria-expanded", "false");
+  settingsToggle.querySelector("span:last-child").textContent = "+";
+  settingsForm.hidden = true;
+  if (selectedFeatureId) {
+    const feature = window.RDC_PROVINCES.features.find(
+      (item) => item.properties.shapeID === selectedFeatureId
+    );
+    if (feature) {
+      searchProvinceNews(feature);
+    }
+  }
+});
+
+function formatPublicationDate(value) {
+  if (!value) return "Date non communiquée";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(date);
+}
+
+function renderOutbreakSection() {
+  const records = Array.isArray(window.RDC_HEALTH_DATA)
+    ? window.RDC_HEALTH_DATA.filter((record) =>
+      record.status === "confirmed" || record.status === "alert" || record.status === "historical"
+    )
+    : [];
+  outbreakList.replaceChildren();
+
+  if (!records.length) {
+    const empty = document.createElement("p");
+    empty.className = "news-status";
+    empty.textContent = "Aucune épidémie ou alerte officielle n’est chargée pour le moment.";
+    outbreakList.appendChild(empty);
+    return;
+  }
+
+  records.forEach((record) => {
+    const statusDetails = {
+      confirmed: { className: "is-confirmed", label: "Confirmation officielle" },
+      alert: { className: "is-alert", label: "Alerte officielle" },
+      historical: { className: "is-historical", label: "Information historique" }
+    }[record.status];
+    const card = document.createElement("article");
+    card.className = `outbreak-card ${statusDetails.className}`;
+
+    const status = document.createElement("span");
+    status.className = "outbreak-status";
+    status.textContent = statusDetails.label;
+
+    const heading = document.createElement("h3");
+    heading.textContent = record.disease;
+
+    const location = document.createElement("p");
+    location.textContent = `Zone : ${record.province}${record.provisional ? " · Données provisoires" : ""}`;
+
+    const link = document.createElement("a");
+    link.href = record.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = `Lire la publication de ${record.source} ↗`;
+
+    const meta = document.createElement("small");
+    meta.className = "outbreak-meta";
+    meta.textContent = `Publication : ${formatPublicationDate(record.date)}`;
+
+    card.append(status, heading, location, link, meta);
+    if (record.note) {
+      const note = document.createElement("p");
+      note.textContent = record.note;
+      card.appendChild(note);
+    }
+    outbreakList.appendChild(card);
+  });
+}
+
+function createNewsCard(title, articles, sourceName) {
+  const card = document.createElement("article");
+  card.className = "news-source";
+
+  const heading = document.createElement("h4");
+  heading.textContent = `${sourceName} — médiatique, non confirmatoire`;
+  card.appendChild(heading);
+
+  if (!articles.length) {
+    const status = document.createElement("p");
+    status.className = "news-meta";
+    status.textContent = "Aucun article trouvé pour cette recherche récente.";
+    card.appendChild(status);
+    return card;
+  }
+
+  articles.slice(0, 5).forEach((article) => {
+    const link = document.createElement("a");
+    link.href = article.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = article.title;
+
+    const meta = document.createElement("p");
+    meta.className = "news-meta";
+    const publisher = article.publisher ? ` · ${article.publisher}` : "";
+    meta.textContent = `Source : ${sourceName}${publisher} · Publication : ${formatPublicationDate(article.date)}`;
+
+    card.appendChild(link);
+    card.appendChild(meta);
+  });
+
+  return card;
+}
+
+function renderDailyUpdates() {
+  dailyNewsFeed.replaceChildren();
+  const updates = window.RDC_DAILY_UPDATES;
+  if (!updates || !Array.isArray(updates.items)) {
+    dailyUpdateStatus.textContent = "Le flux quotidien est indisponible.";
+    dailySourceStatus.textContent = "Les autres informations du site restent consultables.";
+    return;
+  }
+
+  if (updates.updatedAt) {
+    const updatedAt = new Date(updates.updatedAt);
+    if (Number.isNaN(updatedAt.getTime())) {
+      dailyUpdateStatus.textContent = "La date de dernière collecte est invalide.";
+    } else {
+      const formatted = new Intl.DateTimeFormat("fr-FR", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(updatedAt);
+      const stale = Date.now() - updatedAt.getTime() > 36 * 60 * 60 * 1000;
+      dailyUpdateStatus.textContent = `Dernière collecte : ${formatted}${stale ? " · actualisation en retard" : ""}`;
+      dailyUpdateStatus.classList.toggle("is-stale", stale);
+    }
+  } else {
+    dailyUpdateStatus.textContent = "La première collecte quotidienne sera publiée par GitHub Actions.";
+  }
+
+  const sourceResults = Array.isArray(updates.sources) ? updates.sources : [];
+  const unavailable = sourceResults
+    .filter((source) => source.state === "not_configured" || source.state === "error")
+    .map((source) => source.state === "not_configured"
+      ? `${source.name} non configuré`
+      : `${source.name} indisponible aujourd’hui`);
+  dailySourceStatus.textContent = unavailable.length
+    ? `Flux facultatifs ou indisponibles : ${unavailable.join(" · ")}.`
+    : "";
+
+  const items = updates.items.filter((item) =>
+    item && typeof item.title === "string" &&
+    typeof item.url === "string" && item.url.startsWith("https://")
+  );
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "daily-news-empty";
+    empty.textContent = "Aucune publication récente n’a été trouvée dans les flux disponibles.";
+    dailyNewsFeed.appendChild(empty);
+    return;
+  }
+
+  const categoryLabels = {
+    official: "Source officielle",
+    humanitarian: "Source humanitaire",
+    media: "Média · non confirmatoire"
+  };
+  const categoryNotes = {
+    official: "Publication officielle; elle ne modifie pas automatiquement le statut affiché sur la carte.",
+    humanitarian: "Publication humanitaire; elle ne constitue pas une confirmation officielle d’épidémie.",
+    media: "Information médiatique; elle ne constitue pas une confirmation officielle d’épidémie."
+  };
+
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = `daily-news-card daily-news-${item.category || "other"}`;
+
+    const category = document.createElement("span");
+    category.className = "daily-news-category";
+    category.textContent = categoryLabels[item.category] || "Publication sanitaire";
+
+    const link = document.createElement("a");
+    link.href = item.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = item.title;
+
+    const meta = document.createElement("p");
+    meta.className = "daily-news-meta";
+    const publisher = item.publisher && item.publisher !== item.source
+      ? ` · ${item.publisher}`
+      : "";
+    meta.textContent = `Source : ${item.source || "Non précisée"}${publisher} · Publication : ${formatPublicationDate(item.publishedAt)}`;
+
+    const note = document.createElement("p");
+    note.className = "daily-news-meta";
+    note.textContent = categoryNotes[item.category] || categoryNotes.humanitarian;
+
+    card.append(category, link, meta, note);
+    dailyNewsFeed.appendChild(card);
+  });
+}
+
+function loadDailyUpdates() {
+  const script = document.createElement("script");
+  const cacheDate = new Date().toISOString().slice(0, 10);
+  script.src = `data/daily-updates.js?date=${cacheDate}`;
+  script.addEventListener("load", renderDailyUpdates, { once: true });
+  script.addEventListener("error", () => {
+    dailyUpdateStatus.textContent = "Le flux quotidien n’a pas pu être chargé.";
+    dailySourceStatus.textContent = "Les informations statiques et la carte restent disponibles.";
+    console.error("Impossible de charger data/daily-updates.js.");
+  }, { once: true });
+  document.head.appendChild(script);
+}
+
+async function fetchGNews(query) {
+  const key = sessionStorage.getItem("gnews-key");
+  if (!key) return { available: false, articles: [] };
+  const url = new URL("https://gnews.io/api/v4/search");
+  url.searchParams.set("q", `${query} (épidémie OR choléra OR Ebola OR mpox OR rougeole)`);
+  url.searchParams.set("lang", "fr");
+  url.searchParams.set("country", "cd");
+  url.searchParams.set("max", "5");
+  url.searchParams.set("apikey", key);
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`GNews répond HTTP ${response.status}`);
+  const data = await response.json();
+  return {
+    available: true,
+    articles: (data.articles || []).map((article) => ({
+      title: article.title,
+      url: article.url,
+      date: article.publishedAt,
+      publisher: article.source?.name
+    }))
+  };
+}
+
+async function fetchNewsData(query) {
+  const key = sessionStorage.getItem("newsdata-key");
+  if (!key) return { available: false, articles: [] };
+  const url = new URL("https://newsdata.io/api/1/latest");
+  url.searchParams.set("apikey", key);
+  url.searchParams.set("q", `${query} AND (choléra OR Ebola OR mpox OR rougeole OR épidémie)`);
+  url.searchParams.set("language", "fr");
+  url.searchParams.set("country", "cd");
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`NewsData.io répond HTTP ${response.status}`);
+  const data = await response.json();
+  return {
+    available: true,
+    articles: (data.results || []).map((article) => ({
+      title: article.title,
+      url: article.link,
+      date: article.pubDate,
+      publisher: article.source_name
+    }))
+  };
+}
+
+async function searchProvinceNews(feature) {
+  const name = getProvinceName(feature);
+  const gnewsKey = sessionStorage.getItem("gnews-key");
+  const newsdataKey = sessionStorage.getItem("newsdata-key");
+  emptyState.hidden = true;
+  newsResults.hidden = false;
+  newsResults.replaceChildren();
+
+  const officialCard = createOfficialCard(feature);
+  if (officialCard) {
+    newsResults.appendChild(officialCard);
+  } else {
+    const officialStatus = document.createElement("p");
+    officialStatus.className = "news-status";
+    officialStatus.textContent = "Aucune donnée officielle confirmée ou alertée n’est actuellement chargée pour cette province.";
+    newsResults.appendChild(officialStatus);
+  }
+
+  if (!gnewsKey && !newsdataKey) {
+    const status = document.createElement("p");
+    status.className = "news-status";
+    status.textContent = "Flux médiatiques non activés. Configurez une clé pour lancer une recherche sur cette province.";
+    newsResults.appendChild(status);
+    return;
+  }
+
+  const status = document.createElement("p");
+  status.className = "news-status";
+  status.textContent = `Recherche médiatique récente — ${name}. Les résultats ci-dessous ne constituent pas une confirmation officielle.`;
+  newsResults.appendChild(status);
+
+  const searches = [
+    { name: "GNews", fetcher: fetchGNews },
+    { name: "NewsData.io", fetcher: fetchNewsData }
+  ];
+
+  await Promise.all(searches.map(async (search) => {
+    try {
+      const result = await search.fetcher(name);
+      if (result.available) {
+        newsResults.appendChild(createNewsCard(name, result.articles, search.name));
+      }
+    } catch (error) {
+      console.error(error);
+      const card = document.createElement("article");
+      card.className = "news-source";
+      card.innerHTML = `<h4>${search.name}</h4><p class="news-meta">Flux indisponible : vérifiez la clé, le quota ou l’accès réseau.</p>`;
+      newsResults.appendChild(card);
+    }
+  }));
+}
+
+function getProvinceName(feature) {
+  const name = feature.properties.shapeName;
+  return provinceNames[name] || name;
+}
+
+function coordinatesForFeature(feature) {
+  const geometry = feature.geometry;
+  if (geometry.type === "Polygon") {
+    return geometry.coordinates;
+  }
+  if (geometry.type === "MultiPolygon") {
+    return geometry.coordinates.flat();
+  }
+  return [];
+}
+
+function projectCoordinates(features, width, height, padding) {
+  const points = [];
+  features.forEach((feature) => {
+    coordinatesForFeature(feature).forEach((ring) => {
+      ring.forEach(([longitude, latitude]) => points.push([longitude, latitude]));
+    });
+  });
+  const longitudes = points.map(([longitude]) => longitude);
+  const latitudes = points.map(([, latitude]) => latitude);
+  const minLongitude = Math.min(...longitudes);
+  const maxLongitude = Math.max(...longitudes);
+  const minLatitude = Math.min(...latitudes);
+  const maxLatitude = Math.max(...latitudes);
+  const scale = Math.min(
+    (width - padding * 2) / (maxLongitude - minLongitude),
+    (height - padding * 2) / (maxLatitude - minLatitude)
+  );
+  const drawnWidth = (maxLongitude - minLongitude) * scale;
+  const drawnHeight = (maxLatitude - minLatitude) * scale;
+  const offsetX = (width - drawnWidth) / 2;
+  const offsetY = (height - drawnHeight) / 2;
+
+  return ([longitude, latitude]) => [
+    offsetX + (longitude - minLongitude) * scale,
+    height - offsetY - (latitude - minLatitude) * scale
+  ];
+}
+
+function featurePath(feature, project) {
+  return coordinatesForFeature(feature)
+    .map((ring) => ring.map((point, index) => {
+      const [x, y] = project(point);
+      return `${index === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
+    }).join(" ") + " Z")
+    .join(" ");
+}
+
+function provinceCentroid(feature, project) {
+  const rings = coordinatesForFeature(feature);
+  let largestRing = rings[0] || [];
+  rings.forEach((ring) => {
+    if (ring.length > largestRing.length) largestRing = ring;
+  });
+  if (!largestRing.length) return [0, 0];
+  const projected = largestRing.map((point) => project(point));
+  const xs = projected.map(([x]) => x);
+  const ys = projected.map(([, y]) => y);
+  return [
+    xs.reduce((sum, value) => sum + value, 0) / xs.length,
+    ys.reduce((sum, value) => sum + value, 0) / ys.length
+  ];
+}
+
+function officialDiseaseLabel(feature) {
+  const records = getOfficialRecords(feature)
+    .filter((record) => record.status === "confirmed" || record.status === "alert");
+  if (!records.length) return "";
+  return records.map((record) => record.mapLabel || record.disease).join(" · ");
+}
+
+function selectCity(record, marker) {
+  selectedFeatureId = null;
+  map.querySelectorAll(".province-shape").forEach((shape) => {
+    shape.classList.remove("is-selected");
+    shape.setAttribute("aria-pressed", "false");
+  });
+  provinceList.querySelectorAll(".province-button").forEach((button) => {
+    button.classList.remove("is-selected");
+    button.setAttribute("aria-pressed", "false");
+  });
+  map.querySelectorAll(".city-marker").forEach((item) => {
+    item.classList.toggle("is-selected", item === marker);
+  });
+  if (marker) {
+    const point = marker.querySelector(".city-marker-dot");
+    if (point) {
+      zoomMapToPoint(Number(point.getAttribute("cx")), Number(point.getAttribute("cy")));
+    }
+  }
+
+  detailTitle.textContent = record.name;
+  detailCopy.textContent = `${record.province} · ${record.disease} · ${record.statusLabel}`;
+  selectedLegend.textContent = `${record.name} — ${record.statusLabel}`;
+  newsResults.replaceChildren();
+  newsResults.hidden = false;
+  emptyState.hidden = true;
+
+  const card = document.createElement("article");
+  card.className = "news-source";
+  card.classList.add(`city-status-${record.status}`);
+  const heading = document.createElement("h4");
+  const headings = {
+    ongoing: "Transmission signalée",
+    controlled: "Foyer initial contrôlé",
+    community: "Mobilisation communautaire rapportée",
+    access: "Incident affectant l’accès à la riposte",
+    indicator: "Indicateur provincial — pas une confirmation d’épidémie"
+  };
+  heading.textContent = headings[record.status] || "Information rapportée";
+  const link = document.createElement("a");
+  link.href = record.url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = record.disease;
+  const meta = document.createElement("p");
+  meta.className = "news-meta";
+  const areaMeta = record.status === "indicator"
+    ? `Repère : ${record.name} · Niveau des données : province du ${record.province}`
+    : `Ville/localité : ${record.name} · Province : ${record.province}`;
+  meta.textContent = `${areaMeta} · Source : ${record.source} · Publication : ${formatPublicationDate(record.date)}`;
+  const note = document.createElement("p");
+  note.className = "news-meta";
+  note.textContent = `${record.note} Situation rapportée à la date de publication ; elle peut évoluer.`;
+  card.append(heading, link, meta, note);
+  newsResults.appendChild(card);
+
+  if (marker) marker.focus();
+}
+
+function addCityMarkers(project) {
+  const cities = Array.isArray(window.RDC_CITY_HEALTH_DATA)
+    ? window.RDC_CITY_HEALTH_DATA
+    : [];
+  cities.forEach((record) => {
+    const [x, y] = project([record.longitude, record.latitude]);
+    const offset = record.labelOffset || [10, 3];
+    const labelX = x + offset[0];
+    const labelY = y + offset[1];
+    const statusClasses = {
+      ongoing: "city-marker-ongoing",
+      controlled: "city-marker-controlled",
+      community: "city-marker-community",
+      access: "city-marker-access",
+      indicator: "city-marker-indicator"
+    };
+    const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    group.setAttribute("class", `city-marker ${statusClasses[record.status] || "city-marker-community"}`);
+    group.setAttribute("role", "button");
+    group.setAttribute("tabindex", "0");
+    group.setAttribute("aria-label", `${record.name}, ${record.province} : ${record.statusLabel}`);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("class", "city-marker-dot");
+    circle.setAttribute("cx", x.toFixed(2));
+    circle.setAttribute("cy", y.toFixed(2));
+    circle.setAttribute("r", record.status === "ongoing" || record.status === "access" ? "7" : "5.5");
+
+    const connector = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    connector.setAttribute("class", "city-marker-connector");
+    connector.setAttribute("x1", x.toFixed(2));
+    connector.setAttribute("y1", y.toFixed(2));
+    connector.setAttribute("x2", (labelX + (offset[0] < 0 ? 2 : -2)).toFixed(2));
+    connector.setAttribute("y2", (labelY - 2).toFixed(2));
+    group.appendChild(connector);
+    group.appendChild(circle);
+
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("class", "city-marker-label");
+    label.setAttribute("x", labelX.toFixed(2));
+    label.setAttribute("y", labelY.toFixed(2));
+    label.setAttribute("text-anchor", offset[0] < 0 ? "end" : "start");
+    label.textContent = record.name;
+    group.appendChild(label);
+
+    group.addEventListener("click", () => selectCity(record, group));
+    group.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectCity(record, group);
+      }
+    });
+    map.appendChild(group);
+  });
+}
+
+function selectProvince(feature, path) {
+  selectedFeatureId = feature.properties.shapeID;
+  if (path) {
+    zoomMapToBounds(path.getBBox());
+  }
+  map.querySelectorAll(".province-shape").forEach((shape) => {
+    const isSelected = shape.dataset.featureId === selectedFeatureId;
+    shape.classList.toggle("is-selected", isSelected);
+    shape.setAttribute("aria-pressed", String(isSelected));
+  });
+  provinceList.querySelectorAll(".province-button").forEach((button) => {
+    const isSelected = button.dataset.featureId === selectedFeatureId;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+
+  const name = getProvinceName(feature);
+  detailTitle.textContent = name;
+  detailCopy.textContent = "Zone administrative sélectionnée en République démocratique du Congo.";
+  selectedLegend.textContent = name;
+  if (!getOfficialRecords(feature).length) {
+    selectedLegend.textContent = `${name} — aucune donnée officielle chargée`;
+  }
+  searchProvinceNews(feature);
+  if (path) {
+    path.focus();
+  }
+}
+
+function addProvince(feature, project) {
+  const name = getProvinceName(feature);
+  const featureId = feature.properties.shapeID;
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("class", "province-shape");
+  path.setAttribute("d", featurePath(feature, project));
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("role", "button");
+  path.setAttribute("tabindex", "0");
+  path.setAttribute("aria-label", `Sélectionner la province ${name}`);
+  path.setAttribute("aria-pressed", "false");
+  path.dataset.featureId = featureId;
+  path.addEventListener("click", () => selectProvince(feature, path));
+  path.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectProvince(feature, path);
+    }
+  });
+  map.appendChild(path);
+
+  const [labelX, labelY] = provinceCentroid(feature, project);
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("class", "province-label");
+  label.setAttribute("x", labelX.toFixed(2));
+  label.setAttribute("y", labelY.toFixed(2));
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("aria-hidden", "true");
+  label.setAttribute("pointer-events", "none");
+  label.textContent = name;
+  map.appendChild(label);
+
+  const diseaseLabel = officialDiseaseLabel(feature);
+  if (diseaseLabel) {
+    const healthLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    healthLabel.setAttribute("class", "health-label");
+    healthLabel.setAttribute("x", labelX.toFixed(2));
+    healthLabel.setAttribute("y", (labelY + 13).toFixed(2));
+    healthLabel.setAttribute("text-anchor", "middle");
+    healthLabel.setAttribute("aria-hidden", "true");
+    healthLabel.setAttribute("pointer-events", "none");
+    healthLabel.textContent = diseaseLabel;
+    map.appendChild(healthLabel);
+  }
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "province-button";
+  button.textContent = name;
+  button.dataset.featureId = featureId;
+  button.setAttribute("aria-pressed", "false");
+  button.addEventListener("click", () => selectProvince(feature, path));
+  provinceList.appendChild(button);
+}
+
+function loadProvinces() {
+  try {
+    const data = window.RDC_PROVINCES;
+    if (!data || !Array.isArray(data.features) || data.features.length === 0) {
+      throw new Error("Le jeu de données ne contient aucune province.");
+    }
+
+    const project = projectCoordinates(data.features, 820, 740, 24);
+    data.features
+      .slice()
+      .sort((a, b) => getProvinceName(a).localeCompare(getProvinceName(b), "fr"))
+      .forEach((feature) => addProvince(feature, project));
+    addCityMarkers(project);
+    const localityCount = Array.isArray(window.RDC_CITY_HEALTH_DATA)
+      ? window.RDC_CITY_HEALTH_DATA.length
+      : 0;
+    mapCount.textContent = `${data.features.length} provinces · ${localityCount} repères`;
+    applyOfficialMapStatus();
+  } catch (error) {
+    console.error(error);
+    mapCount.textContent = "Carte indisponible";
+    mapError.hidden = false;
+  }
+}
+
+renderOutbreakSection();
+loadProvinces();
+loadDailyUpdates();
