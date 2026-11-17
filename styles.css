@@ -360,6 +360,31 @@ main {
   color: #c9efa1;
 }
 
+.app-section#accueil .intro-aside {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.home-logo-mark {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(13, 51, 37, 0.2);
+}
+
+.home-logo-mark svg {
+  width: 45px;
+  height: 45px;
+}
+
 .eyebrow {
   margin: 0 0 10px;
   color: var(--green);
