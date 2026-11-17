@@ -4,7 +4,7 @@ Application statique de veille sanitaire avec carte des provinces, informations 
 
 ## Commits automatiques locaux
 
-Dans VS Code, la tâche **Commit automatique après sauvegarde** démarre à l’ouverture du dossier. Elle attend 1,5 seconde sans nouvel événement de fichier, puis ajoute et commit les changements Git; elle ne pousse jamais vers GitHub. Autorisez les tâches automatiques du dossier dans VS Code si demandé.
+Dans VS Code, la tâche **Commit automatique après sauvegarde** démarre à l’ouverture du dossier. Elle attend 1,5 seconde sans nouvel événement de fichier, puis ajoute et commit tous les changements non ignorés; elle ne pousse jamais vers GitHub. Autorisez les tâches automatiques du dossier dans VS Code si demandé.
 
 Les fichiers `.env`, clés et certificats privés sont exclus via `.gitignore`. Vérifiez les changements sensibles avant de les enregistrer dans des fichiers suivis par Git. Pour arrêter la surveillance, utilisez **Tasks: Terminate Task**; pour la redémarrer, lancez la tâche depuis **Terminal → Run Task**.
 

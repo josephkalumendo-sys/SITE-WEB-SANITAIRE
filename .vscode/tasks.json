@@ -10,7 +10,9 @@
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}\\scripts\\auto-commit-on-save.ps1"
+        "${workspaceFolder}\\scripts\\auto-commit-on-save.ps1",
+        "-RepositoryRoot",
+        "${workspaceFolder}"
       ],
       "isBackground": true,
       "problemMatcher": [],

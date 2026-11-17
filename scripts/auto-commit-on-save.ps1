@@ -1,11 +1,15 @@
 [CmdletBinding()]
 param(
-  [string]$RepositoryRoot = (Join-Path $PSScriptRoot ".."),
+  [string]$RepositoryRoot,
   [ValidateRange(500, 10000)]
   [int]$QuietPeriodMilliseconds = 1500
 )
 
 $ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
+  $RepositoryRoot = Join-Path $PSScriptRoot ".."
+}
+
 $rootOutput = & git -C $RepositoryRoot rev-parse --show-toplevel
 if ($LASTEXITCODE -ne 0) {
   throw "Impossible de trouver la racine du dépôt Git."
