@@ -1938,6 +1938,24 @@ footer {
     border-radius: 16px;
   }
 
+  .app-section#accueil .intro-aside {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .home-logo-mark {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+
+  .home-logo-mark svg {
+    width: 34px;
+    height: 34px;
+  }
+
   .app-section#accueil .intro::after {
     top: -50px;
     right: -220px;
