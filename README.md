@@ -2,6 +2,12 @@
 
 Application statique de veille sanitaire avec carte des provinces, informations sourcées et actualités.
 
+## Commits automatiques locaux
+
+Dans VS Code, la tâche **Commit automatique après sauvegarde** démarre à l’ouverture du dossier. Elle attend 1,5 seconde sans nouvel événement de fichier, puis ajoute et commit les changements Git; elle ne pousse jamais vers GitHub. Autorisez les tâches automatiques du dossier dans VS Code si demandé.
+
+Les fichiers `.env`, clés et certificats privés sont exclus via `.gitignore`. Vérifiez les changements sensibles avant de les enregistrer dans des fichiers suivis par Git. Pour arrêter la surveillance, utilisez **Tasks: Terminate Task**; pour la redémarrer, lancez la tâche depuis **Terminal → Run Task**.
+
 ## Actualisation quotidienne
 
 Le workflow GitHub Actions `.github/workflows/actualisation-quotidienne.yml` collecte chaque jour à 04:00 UTC les publications récentes du flux OMS Afrique et de ReliefWeb, puis publie le site sur GitHub Pages. Il peut aussi être lancé manuellement depuis l’onglet **Actions**.

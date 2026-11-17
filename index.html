@@ -11,10 +11,18 @@
     <div class="app-shell" id="app-shell">
       <aside class="app-sidebar" id="app-sidebar" aria-label="Navigation de l’application">
         <a class="brand" href="#accueil" aria-label="Veille sanitaire, accueil">
-        <span class="brand-mark" aria-hidden="true">V</span>
-        <span>Veille<span class="brand-light"> sanitaire</span></span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" focusable="false">
+              <path d="M24 5 38 10.5v11.2c0 9-5.8 15.9-14 20.3-8.2-4.4-14-11.3-14-20.3V10.5L24 5Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M13 24h7l3-7 4 14 4-7h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"/>
+            </svg>
+          </span>
+          <span class="brand-wordmark">
+            <span>Veille<span class="brand-light"> sanitaire</span></span>
+            <small>Surveillance · RDC</small>
+          </span>
         </a>
-        <p class="sidebar-caption">SURVEILLANCE SANITAIRE</p>
+        <p class="sidebar-caption">SECTIONS</p>
         <nav class="app-nav" aria-label="Sections principales">
           <a class="app-nav-link is-active" href="#accueil" aria-current="page"><span class="nav-number">01</span>Accueil</a>
           <a class="app-nav-link" href="#actualites"><span class="nav-number">02</span>Actualités sanitaires</a>
@@ -53,6 +61,53 @@
       <section class="notice" aria-label="Précision importante">
         <span class="notice-icon" aria-hidden="true">i</span>
         <p><strong>À retenir</strong> — Une publication médiatique n’est pas une confirmation officielle d’épidémie. Seules les autorités sanitaires compétentes peuvent confirmer une situation épidémique.</p>
+      </section>
+
+      <section class="section-dashboard" aria-labelledby="section-dashboard-title">
+        <div class="section-dashboard-heading">
+          <div>
+            <p class="eyebrow">Explorer l’application</p>
+            <h2 id="section-dashboard-title">Rubriques de veille sanitaire</h2>
+          </div>
+          <p>Choisissez une rubrique pour ouvrir son contenu.</p>
+        </div>
+        <nav class="section-dashboard-grid" aria-label="Accès aux rubriques">
+          <a class="section-dashboard-card" href="#accueil">
+            <span class="section-dashboard-number">01</span>
+            <span class="section-dashboard-copy"><strong>Accueil</strong><span>Point de situation national et repères clés.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#actualites">
+            <span class="section-dashboard-number">02</span>
+            <span class="section-dashboard-copy"><strong>Actualités sanitaires</strong><span>Carte interactive, provinces, villes et publications.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#epidemies">
+            <span class="section-dashboard-number">03</span>
+            <span class="section-dashboard-copy"><strong>Épidémies et alertes</strong><span>Informations officielles et alertes vérifiées.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#innovations">
+            <span class="section-dashboard-number">04</span>
+            <span class="section-dashboard-copy"><strong>Innovations numériques</strong><span>Outils et usages numériques en santé.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#campagnes">
+            <span class="section-dashboard-number">05</span>
+            <span class="section-dashboard-copy"><strong>Campagnes de sensibilisation</strong><span>Messages de prévention et actions de sensibilisation.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#verification">
+            <span class="section-dashboard-number">06</span>
+            <span class="section-dashboard-copy"><strong>Rumeurs et vérification</strong><span>Signalements et éléments de vérification.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a class="section-dashboard-card" href="#ressources">
+            <span class="section-dashboard-number">07</span>
+            <span class="section-dashboard-copy"><strong>Ressources et rapports</strong><span>Sources, documents et rapports de référence.</span></span>
+            <span class="section-dashboard-arrow" aria-hidden="true">↗</span>
+          </a>
+        </nav>
       </section>
 
       <section class="national-summary" aria-labelledby="summary-title">
@@ -121,6 +176,7 @@
             <span class="legend-swatch legend-city-community"></span> Action communautaire rapportée
             <span class="legend-swatch legend-city-access"></span> Accès à la riposte entravé
             <span class="legend-swatch legend-city-indicator"></span> Indicateur VIH provincial, non spécifique à la ville
+            <span class="legend-swatch legend-city-provincial"></span> Contexte Ebola provincial, sans bilan par ville
             <span class="legend-swatch legend-alert"></span> Alerte officielle
             <span class="legend-separator">·</span>
             <span id="selected-legend">Aucune sélection</span>
@@ -129,7 +185,7 @@
             <h3>Provinces</h3>
             <div class="province-list" id="province-list" aria-label="Liste des provinces"></div>
           </div>
-          <p class="map-attribution">Contours et coordonnées des localités : <a href="https://www.geoboundaries.org/" target="_blank" rel="noopener noreferrer">geoBoundaries</a> et <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap (ODbL)</a>. Situations épidémiques : OMS Afrique, publications du 28/10 au 15/11/2026. Indicateur VIH du Lualaba : <a href="https://phia.icap.columbia.edu/wp-content/uploads/2026/05/CODPHIA-SS-French_V4.pdf" target="_blank" rel="noopener noreferrer">CODPHIA 2024</a>.</p>
+          <p class="map-attribution">Contours et coordonnées des localités : <a href="https://www.geoboundaries.org/" target="_blank" rel="noopener noreferrer">geoBoundaries</a> et <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap (ODbL)</a>. Situations épidémiques : OMS Afrique, publications du 28/10 au 15/11/2026. Contexte provincial Beni/Goma : <a href="https://reliefweb.int/report/democratic-republic-congo/multi-country-bundibugyo-ebola-virus-disease-outbreak-situation-report-no-26-2-8-november-2026" target="_blank" rel="noopener noreferrer">rapport OIM via ReliefWeb, 13/11/2026</a>; pas de bilan propre à ces villes. Indicateur VIH du Lualaba : <a href="https://phia.icap.columbia.edu/wp-content/uploads/2026/05/CODPHIA-SS-French_V4.pdf" target="_blank" rel="noopener noreferrer">CODPHIA 2024</a>.</p>
         </div>
 
         <aside class="detail-card" aria-live="polite" aria-labelledby="detail-title">
@@ -309,6 +365,22 @@
             <p>Les articles médiatiques sont des pistes à vérifier, pas des confirmations officielles d’épidémie.</p>
           </article>
         </div>
+        <section class="comment-panel" aria-labelledby="comment-title">
+          <div class="comment-intro">
+            <p class="eyebrow">Contact</p>
+            <h3 id="comment-title">Envoyer un commentaire</h3>
+            <p>Partagez une remarque ou une question sur la veille sanitaire. Le message sera préparé dans votre logiciel de messagerie et ne sera pas publié sur le site.</p>
+            <a href="mailto:mariettekalu@gmail.com">mariettekalu@gmail.com</a>
+          </div>
+          <form class="comment-form" id="comment-form" data-recipient="mariettekalu@gmail.com">
+            <label for="comment-email">Votre adresse e-mail</label>
+            <input id="comment-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+            <label for="comment-message">Message</label>
+            <textarea id="comment-message" name="message" rows="6" maxlength="4000" required></textarea>
+            <button type="submit">Préparer le courriel</button>
+            <p class="comment-status" id="comment-status" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
       </section>
         </main>
 
@@ -320,9 +392,6 @@
     </div>
     <button class="nav-backdrop" id="nav-backdrop" type="button" aria-label="Fermer la navigation" hidden></button>
 
-    <script src="data/provinces-rdc.js"></script>
-    <script src="data/health-data.js"></script>
-    <script src="data/city-health-data.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

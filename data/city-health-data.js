@@ -1,5 +1,6 @@
 /*
- * Outbreak statuses come from WHO Africa; the Lualaba HIV estimate is from CODPHIA.
+ * WHO Africa provides outbreak statuses; IOM reports provide provincial context.
+ * The Lualaba HIV estimate is from CODPHIA.
  * Coordinates are OpenStreetMap place coordinates (ODbL).
  * A controlled initial epicentre is not a claim that the wider outbreak ended.
  */
@@ -89,6 +90,20 @@ window.RDC_CITY_HEALTH_DATA = [
     note: "L’OMS rapporte que la transmission rapide a été interrompue dans cet épicentre initial."
   },
   {
+    name: "Beni",
+    province: "Nord-Kivu",
+    latitude: 0.4917,
+    longitude: 29.4731,
+    labelOffset: [10, -5],
+    disease: "Maladie à virus Bundibugyo (Ebola) — contexte provincial",
+    status: "provincial",
+    statusLabel: "Situation rapportée au Nord-Kivu — pas de bilan propre à la ville",
+    source: "OIM — rapport de situation publié sur ReliefWeb",
+    date: "2026-11-13",
+    url: "https://reliefweb.int/report/democratic-republic-congo/multi-country-bundibugyo-ebola-virus-disease-outbreak-situation-report-no-26-2-8-november-2026",
+    note: "Le rapport situe la transmission en RDC dans l’Ituri et le Nord-Kivu au 7 novembre 2026, sans fournir de bilan spécifique pour Beni. Ce repère indique un contexte provincial et ne confirme pas une épidémie dans la ville."
+  },
+  {
     name: "Butembo",
     province: "Nord-Kivu",
     latitude: 0.1249694,
@@ -100,7 +115,21 @@ window.RDC_CITY_HEALTH_DATA = [
     source: "OMS Afrique",
     date: "2026-11-15",
     url: "https://www.afro.who.int/countries/democratic-republic-of-congo/news/six-months-accessing-hard-reach-communities-key-halting-ebola-outbreak",
-    note: "L’OMS rapporte que la transmission rapide a été interrompue dans cet épicentre initial."
+    note: "Au 15 novembre 2026, l’OMS cite Butembo parmi les épicentres initiaux où la transmission rapide a été interrompue. La publication ne donne pas de bilan actuel de cas propre à la ville."
+  },
+  {
+    name: "Goma",
+    province: "Nord-Kivu",
+    latitude: -1.6792,
+    longitude: 29.2228,
+    labelOffset: [10, 4],
+    disease: "Maladie à virus Bundibugyo (Ebola) — contexte provincial",
+    status: "provincial",
+    statusLabel: "Situation rapportée au Nord-Kivu — pas de bilan propre à la ville",
+    source: "OIM — rapport de situation publié sur ReliefWeb",
+    date: "2026-11-13",
+    url: "https://reliefweb.int/report/democratic-republic-congo/multi-country-bundibugyo-ebola-virus-disease-outbreak-situation-report-no-26-2-8-november-2026",
+    note: "Le rapport situe la transmission en RDC dans l’Ituri et le Nord-Kivu au 7 novembre 2026, sans fournir de bilan spécifique pour Goma. Ce repère indique un contexte provincial et ne confirme pas une épidémie dans la ville."
   },
   {
     name: "Iga Barrière",

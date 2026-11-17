@@ -21,6 +21,7 @@ const appShell = document.getElementById("app-shell");
 const navToggle = document.getElementById("nav-toggle");
 const navBackdrop = document.getElementById("nav-backdrop");
 const navLinks = [...document.querySelectorAll(".app-nav-link")];
+const appSections = [...document.querySelectorAll("main > .app-section")];
 const outbreakList = document.getElementById("outbreak-list");
 const detailTitle = document.getElementById("detail-title");
 const detailCopy = document.getElementById("detail-copy");
@@ -32,7 +33,12 @@ const dailySourceStatus = document.getElementById("daily-source-status");
 const emptyState = document.getElementById("empty-state");
 const settingsToggle = document.getElementById("settings-toggle");
 const settingsForm = document.getElementById("settings-form");
+const commentForm = document.getElementById("comment-form");
+const commentStatus = document.getElementById("comment-status");
 let selectedFeatureId = null;
+const loadedSectionData = new Set();
+const sectionDataRequests = new Map();
+const dataScriptRequests = new Map();
 const MAP_VIEWBOX = { x: 0, y: 0, width: 820, height: 740 };
 const MAP_ASPECT_RATIO = MAP_VIEWBOX.width / MAP_VIEWBOX.height;
 let currentMapViewBox = { ...MAP_VIEWBOX };
@@ -103,43 +109,133 @@ function setNavigationOpen(isOpen) {
   navBackdrop.hidden = !isOpen;
 }
 
+function loadDataScript(source) {
+  if (dataScriptRequests.has(source)) return dataScriptRequests.get(source);
+
+  const script = document.createElement("script");
+  script.src = source;
+  const request = new Promise((resolve, reject) => {
+    script.addEventListener("load", resolve, { once: true });
+    script.addEventListener("error", () => {
+      reject(new Error(`Impossible de charger ${source}.`));
+    }, { once: true });
+    document.head.appendChild(script);
+  }).catch((error) => {
+    dataScriptRequests.delete(source);
+    throw error;
+  });
+  dataScriptRequests.set(source, request);
+  return request;
+}
+
+function loadSectionData(sectionId) {
+  if (loadedSectionData.has(sectionId) || sectionDataRequests.has(sectionId)) return;
+  const initialize = {
+    actualites: initializeActualitesSection,
+    epidemies: initializeOutbreakSection
+  }[sectionId];
+  if (!initialize) return;
+
+  const request = initialize()
+    .then(() => loadedSectionData.add(sectionId))
+    .catch((error) => {
+      console.error(`Impossible de charger les données de la section ${sectionId}.`, error);
+      if (sectionId === "actualites") {
+        mapCount.textContent = "Carte indisponible";
+        mapError.hidden = false;
+        dailyUpdateStatus.textContent = "Les données de cette section n’ont pas pu être chargées.";
+      } else {
+        const message = document.createElement("p");
+        message.className = "news-status";
+        message.textContent = "Les données officielles ne peuvent pas être chargées pour le moment.";
+        outbreakList.replaceChildren(message);
+      }
+    })
+    .finally(() => sectionDataRequests.delete(sectionId));
+  sectionDataRequests.set(sectionId, request);
+}
+
+async function initializeActualitesSection() {
+  await Promise.all([
+    loadDataScript("data/provinces-rdc.js"),
+    loadDataScript("data/health-data.js"),
+    loadDataScript("data/city-health-data.js")
+  ]);
+  loadProvinces();
+  loadDailyUpdates();
+}
+
+async function initializeOutbreakSection() {
+  const loading = document.createElement("p");
+  loading.className = "news-status";
+  loading.textContent = "Chargement des alertes officielles…";
+  outbreakList.replaceChildren(loading);
+  await loadDataScript("data/health-data.js");
+  renderOutbreakSection();
+}
+
 navToggle.addEventListener("click", () => {
   setNavigationOpen(navToggle.getAttribute("aria-expanded") !== "true");
 });
 navBackdrop.addEventListener("click", () => setNavigationOpen(false));
-navLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks.forEach((item) => {
-      const active = item === link;
-      item.classList.toggle("is-active", active);
-      if (active) item.setAttribute("aria-current", "page");
-      else item.removeAttribute("aria-current");
-    });
-    setNavigationOpen(false);
+
+function showSection(sectionId, options = {}) {
+  const section = appSections.find((item) => item.id === sectionId);
+  if (!section) return false;
+
+  appSections.forEach((item) => {
+    item.hidden = item !== section;
   });
+  navLinks.forEach((link) => {
+    const active = link.hash === `#${sectionId}`;
+    link.classList.toggle("is-active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+  setNavigationOpen(false);
+
+  if (options.updateHistory && location.hash !== `#${sectionId}`) {
+    history.pushState({ sectionId }, "", `#${sectionId}`);
+  }
+  if (options.focus) {
+    section.setAttribute("tabindex", "-1");
+    section.focus({ preventScroll: true });
+  }
+  window.scrollTo(0, 0);
+  loadSectionData(sectionId);
+  return true;
+}
+
+function showSectionFromLocation() {
+  const requestedId = location.hash.slice(1);
+  const sectionId = appSections.some((section) => section.id === requestedId)
+    ? requestedId
+    : appSections[0]?.id;
+  if (sectionId) showSection(sectionId);
+}
+
+document.addEventListener("click", (event) => {
+  if (!(event.target instanceof Element)) return;
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+
+  const sectionId = link.getAttribute("href").slice(1);
+  if (appSections.some((section) => section.id === sectionId)) {
+    event.preventDefault();
+    showSection(sectionId, { updateHistory: true, focus: true });
+  }
 });
+
+window.addEventListener("popstate", showSectionFromLocation);
+window.addEventListener("hashchange", showSectionFromLocation);
+showSectionFromLocation();
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && appShell.classList.contains("nav-open")) {
     setNavigationOpen(false);
     navToggle.focus();
   }
 });
-
-if ("IntersectionObserver" in window) {
-  const sectionObserver = new IntersectionObserver((entries) => {
-    const visible = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visible) return;
-    navLinks.forEach((link) => {
-      const active = link.hash === `#${visible.target.id}`;
-      link.classList.toggle("is-active", active);
-      if (active) link.setAttribute("aria-current", "page");
-      else link.removeAttribute("aria-current");
-    });
-  }, { rootMargin: "-15% 0px -70% 0px", threshold: [0, 0.1, 0.3] });
-  document.querySelectorAll(".app-section").forEach((section) => sectionObserver.observe(section));
-}
 
 function getOfficialRecords(feature) {
   const name = getProvinceName(feature);
@@ -240,6 +336,26 @@ settingsForm.addEventListener("submit", (event) => {
       searchProvinceNews(feature);
     }
   }
+});
+
+commentForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!commentForm.reportValidity()) return;
+
+  const email = document.getElementById("comment-email").value.trim();
+  const message = document.getElementById("comment-message").value.trim();
+  if (!email || !message) {
+    commentStatus.hidden = false;
+    commentStatus.textContent = "Veuillez saisir une adresse e-mail et un message non vides.";
+    return;
+  }
+
+  const subject = encodeURIComponent("Commentaire — Veille sanitaire RDC");
+  const body = encodeURIComponent(`Adresse e-mail : ${email}\n\n${message}`);
+  const recipient = commentForm.dataset.recipient;
+  commentStatus.hidden = false;
+  commentStatus.textContent = "Votre logiciel de messagerie devrait s’ouvrir avec un brouillon prérempli. Vérifiez-le puis envoyez le message; rien n’est transmis avant cet envoi.";
+  window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
 });
 
 function formatPublicationDate(value) {
@@ -654,7 +770,8 @@ function selectCity(record, marker) {
     controlled: "Foyer initial contrôlé",
     community: "Mobilisation communautaire rapportée",
     access: "Incident affectant l’accès à la riposte",
-    indicator: "Indicateur provincial — pas une confirmation d’épidémie"
+    indicator: "Indicateur provincial — pas une confirmation d’épidémie",
+    provincial: "Contexte provincial — la source ne précise pas les cas par ville"
   };
   heading.textContent = headings[record.status] || "Information rapportée";
   const link = document.createElement("a");
@@ -664,7 +781,7 @@ function selectCity(record, marker) {
   link.textContent = record.disease;
   const meta = document.createElement("p");
   meta.className = "news-meta";
-  const areaMeta = record.status === "indicator"
+  const areaMeta = record.status === "indicator" || record.status === "provincial"
     ? `Repère : ${record.name} · Niveau des données : province du ${record.province}`
     : `Ville/localité : ${record.name} · Province : ${record.province}`;
   meta.textContent = `${areaMeta} · Source : ${record.source} · Publication : ${formatPublicationDate(record.date)}`;
@@ -691,7 +808,8 @@ function addCityMarkers(project) {
       controlled: "city-marker-controlled",
       community: "city-marker-community",
       access: "city-marker-access",
-      indicator: "city-marker-indicator"
+      indicator: "city-marker-indicator",
+      provincial: "city-marker-provincial"
     };
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
     group.setAttribute("class", `city-marker ${statusClasses[record.status] || "city-marker-community"}`);
@@ -841,7 +959,3 @@ function loadProvinces() {
     mapError.hidden = false;
   }
 }
-
-renderOutbreakSection();
-loadProvinces();
-loadDailyUpdates();
