@@ -2,9 +2,11 @@
 
 Application statique de veille sanitaire avec carte des provinces, informations sourcées et actualités.
 
-## Commits automatiques locaux
+## Sauvegarde automatique sur GitHub
 
-Dans VS Code, la tâche **Commit automatique après sauvegarde** démarre à l’ouverture du dossier. Elle attend 1,5 seconde sans nouvel événement de fichier, puis ajoute et commit tous les changements non ignorés; elle ne pousse jamais vers GitHub. Autorisez les tâches automatiques du dossier dans VS Code si demandé.
+Dans VS Code, la tâche **Commit automatique après sauvegarde** démarre à l’ouverture du dossier. Elle attend 1,5 seconde sans nouvel événement de fichier, puis ajoute et commit les changements non ignorés et les pousse vers `origin`. Si GitHub est inaccessible, les commits restent en local, un avertissement est affiché et l’envoi est retenté toutes les 60 secondes ainsi qu’après les sauvegardes suivantes. Autorisez les tâches automatiques du dossier dans VS Code si demandé.
+
+Une authentification GitHub est nécessaire une seule fois sur cet ordinateur. Dans le terminal de VS Code, lancez `git push -u origin main` et terminez la connexion proposée par Git Credential Manager; ne mettez jamais de jeton ou de mot de passe dans le code ou le chat. Cette première opération publie aussi les commits locaux déjà en attente. Le dépôt étant public, chaque push rend immédiatement les changements accessibles à tous.
 
 Les fichiers `.env`, clés et certificats privés sont exclus via `.gitignore`. Vérifiez les changements sensibles avant de les enregistrer dans des fichiers suivis par Git. Pour arrêter la surveillance, utilisez **Tasks: Terminate Task**; pour la redémarrer, lancez la tâche depuis **Terminal → Run Task**.
 
