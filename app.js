@@ -35,7 +35,13 @@ const settingsToggle = document.getElementById("settings-toggle");
 const settingsForm = document.getElementById("settings-form");
 const commentForm = document.getElementById("comment-form");
 const commentStatus = document.getElementById("comment-status");
+const analyticsPeriod = document.getElementById("analytics-period");
+const analyticsSummary = document.getElementById("analytics-summary");
+const analyticsChartCanvas = document.getElementById("outbreak-chart");
+const exportReportButton = document.getElementById("export-report");
+const exportReportStatus = document.getElementById("export-report-status");
 let selectedFeatureId = null;
+let outbreakChart = null;
 const loadedSectionData = new Set();
 const sectionDataRequests = new Map();
 const dataScriptRequests = new Map();
@@ -172,7 +178,264 @@ async function initializeOutbreakSection() {
   outbreakList.replaceChildren(loading);
   await loadDataScript("data/health-data.js");
   renderOutbreakSection();
+  await initializeOutbreakAnalytics();
 }
+
+const chartScriptUrl = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
+const pdfScriptUrl = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js";
+
+async function initializeOutbreakAnalytics() {
+  try {
+    await loadDataScript(chartScriptUrl);
+    if (typeof window.Chart !== "function") {
+      throw new Error("Chart.js n’est pas disponible après le chargement du script.");
+    }
+    renderOutbreakChart();
+  } catch (error) {
+    console.error("Impossible de charger le graphique analytique.", error);
+    analyticsSummary.textContent = "Le graphique n’a pas pu être chargé. Vérifiez votre connexion puis réessayez.";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Réessayer le graphique";
+    retry.addEventListener("click", initializeOutbreakAnalytics, { once: true });
+    analyticsSummary.append(" ", retry);
+  }
+}
+
+function getOutbreakRecords() {
+  return Array.isArray(window.RDC_HEALTH_DATA) ? window.RDC_HEALTH_DATA : [];
+}
+
+function getRecordsForChart() {
+  const monthCount = Number(analyticsPeriod.value);
+  const currentMonth = new Date();
+  currentMonth.setDate(1);
+  currentMonth.setHours(0, 0, 0, 0);
+  const firstMonth = new Date(currentMonth);
+  firstMonth.setMonth(firstMonth.getMonth() - monthCount + 1);
+  const statuses = ["confirmed", "alert", "historical"];
+  const records = getOutbreakRecords().filter((record) => {
+    if (!statuses.includes(record.status) || !record.date) return false;
+    const date = new Date(record.date);
+    return !Number.isNaN(date.getTime()) && date >= firstMonth && date <= currentMonth;
+  });
+  const months = Array.from({ length: monthCount }, (_, index) => {
+    const month = new Date(firstMonth);
+    month.setMonth(firstMonth.getMonth() + index);
+    return month;
+  });
+
+  return { records, months };
+}
+
+function renderOutbreakChart() {
+  const { records, months } = getRecordsForChart();
+  const labels = months.map((month) => new Intl.DateTimeFormat("fr-FR", {
+    month: "short",
+    year: "2-digit"
+  }).format(month));
+  const statuses = [
+    { key: "confirmed", label: "Confirmations officielles", color: "#b83b3b" },
+    { key: "alert", label: "Alertes officielles", color: "#d59b42" },
+    { key: "historical", label: "Informations historiques", color: "#aab5ae" }
+  ];
+  const datasets = statuses.map((status) => ({
+    label: status.label,
+    data: months.map((month) => records.filter((record) => {
+      if (record.status !== status.key) return false;
+      const date = new Date(record.date);
+      return date.getFullYear() === month.getFullYear() &&
+        date.getMonth() === month.getMonth();
+    }).length),
+    backgroundColor: status.color,
+    borderRadius: 4
+  }));
+  const totals = statuses.map((status) => ({
+    label: status.label,
+    count: records.filter((record) => record.status === status.key).length
+  }));
+
+  if (outbreakChart) outbreakChart.destroy();
+  outbreakChart = new window.Chart(analyticsChartCanvas, {
+    type: "bar",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      plugins: {
+        legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8 } },
+        tooltip: { callbacks: { label: (context) => `${context.dataset.label} : ${context.parsed.y}` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          ticks: { precision: 0, stepSize: 1 },
+          title: { display: true, text: "Nombre de publications" }
+        }
+      }
+    }
+  });
+  analyticsSummary.textContent = records.length
+    ? totals.map((item) => `${item.label} : ${item.count}`).join(" · ")
+    : "Aucune publication officielle datée dans la période sélectionnée. Cela ne signifie pas qu’aucun cas n’a été signalé.";
+}
+
+analyticsPeriod.addEventListener("change", () => {
+  if (!outbreakChart) return;
+  renderOutbreakChart();
+});
+
+function addPdfText(doc, text, options = {}) {
+  const margin = 16;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+  const fontSize = options.fontSize || 10;
+  doc.setFont("helvetica", options.bold ? "bold" : "normal");
+  doc.setFontSize(fontSize);
+  const lines = doc.splitTextToSize(String(text || ""), maxWidth);
+  const lineHeight = fontSize * 0.5;
+  if (options.y + lines.length * lineHeight > pageHeight - margin) {
+    doc.addPage();
+    options.y = margin;
+  }
+  doc.text(lines, margin, options.y);
+  options.y += lines.length * lineHeight + (options.gap || 4);
+}
+
+function addPdfSourceLink(doc, label, url, options) {
+  if (!url || !url.startsWith("https://")) return;
+  const margin = 16;
+  if (options.y > doc.internal.pageSize.getHeight() - margin - 10) {
+    doc.addPage();
+    options.y = margin;
+  }
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(32, 82, 63);
+  doc.textWithLink(label, margin, options.y, { url });
+  doc.setTextColor(27, 48, 43);
+  options.y += 8;
+}
+
+async function exportWatchReport() {
+  exportReportButton.disabled = true;
+  exportReportStatus.hidden = false;
+  exportReportStatus.textContent = "Préparation du rapport PDF…";
+
+  try {
+    await Promise.all([
+      loadDataScript("data/health-data.js"),
+      window.RDC_DAILY_UPDATES
+        ? Promise.resolve()
+        : loadDataScript(`data/daily-updates.js?date=${new Date().toISOString().slice(0, 10)}`),
+      loadDataScript(pdfScriptUrl)
+    ]);
+
+    const PdfDocument = window.jspdf?.jsPDF;
+    if (typeof PdfDocument !== "function") {
+      throw new Error("jsPDF n’est pas disponible après le chargement du script.");
+    }
+    const records = getOutbreakRecords().filter((record) =>
+      ["confirmed", "alert", "historical"].includes(record.status)
+    );
+    const updates = Array.isArray(window.RDC_DAILY_UPDATES?.items)
+      ? window.RDC_DAILY_UPDATES.items.filter((item) =>
+        item && typeof item.title === "string" && item.url?.startsWith("https://")
+      )
+      : [];
+    if (!records.length && !updates.length) {
+      throw new Error("Aucune donnée sourcée n’est disponible pour produire le rapport.");
+    }
+
+    const doc = new PdfDocument({ format: "a4", unit: "mm" });
+    const layout = { y: 18 };
+    const statusLabels = {
+      confirmed: "Confirmation officielle",
+      alert: "Alerte officielle",
+      historical: "Information historique"
+    };
+    const categoryLabels = {
+      official: "Source officielle",
+      humanitarian: "Source humanitaire — non confirmatoire",
+      media: "Média — non confirmatoire"
+    };
+
+    addPdfText(doc, "Rapport de veille sanitaire — République démocratique du Congo", {
+      ...layout, fontSize: 16, bold: true, gap: 7
+    });
+    layout.y = 31;
+    addPdfText(doc, `Généré le ${new Intl.DateTimeFormat("fr-FR", {
+      dateStyle: "long",
+      timeStyle: "short"
+    }).format(new Date())}`, { ...layout, fontSize: 9, gap: 8 });
+    layout.y += 4;
+    addPdfText(doc, "Ce rapport rassemble les informations disponibles dans l’application au moment de sa génération. Les sources humanitaires et médiatiques ne constituent pas une confirmation officielle d’épidémie. Les informations historiques ne décrivent pas nécessairement la situation actuelle.", {
+      ...layout, fontSize: 10, gap: 8
+    });
+
+    addPdfText(doc, "Épidémies et alertes — sources officielles", {
+      ...layout, fontSize: 13, bold: true, gap: 6
+    });
+    layout.y += 26;
+    if (!records.length) {
+      addPdfText(doc, "Aucune information officielle datée n’est disponible.", {
+        ...layout, fontSize: 10
+      });
+    }
+    records.forEach((record) => {
+      addPdfText(doc, `${record.disease} — ${statusLabels[record.status]}`, {
+        ...layout, fontSize: 11, bold: true, gap: 5
+      });
+      layout.y += 19;
+      addPdfText(doc, `Zone : ${record.province} · Source : ${record.source} · Publication : ${formatPublicationDate(record.date)}`, {
+        ...layout, fontSize: 9, gap: 4
+      });
+      layout.y += 16;
+      if (record.note) {
+        addPdfText(doc, record.note, { ...layout, fontSize: 9, gap: 4 });
+        layout.y += 16;
+      }
+      addPdfSourceLink(doc, "Consulter la source officielle", record.url, layout);
+      layout.y += 2;
+    });
+
+    addPdfText(doc, "Publications récentes — contexte et veille", {
+      ...layout, fontSize: 13, bold: true, gap: 6
+    });
+    layout.y += 26;
+    if (!updates.length) {
+      addPdfText(doc, "Aucune publication récente n’est disponible dans les flux chargés.", {
+        ...layout, fontSize: 10
+      });
+    }
+    updates.forEach((item) => {
+      addPdfText(doc, item.titleFr || item.title, {
+        ...layout, fontSize: 10, bold: true, gap: 5
+      });
+      layout.y += 18;
+      const category = categoryLabels[item.category] || "Publication sanitaire";
+      addPdfText(doc, `${category} · Source : ${item.source || "Non précisée"} · Publication : ${formatPublicationDate(item.publishedAt)}`, {
+        ...layout, fontSize: 9, gap: 4
+      });
+      layout.y += 16;
+      addPdfSourceLink(doc, "Consulter la publication", item.url, layout);
+      layout.y += 2;
+    });
+
+    doc.save(`rapport-veille-sanitaire-rdc-${new Date().toISOString().slice(0, 10)}.pdf`);
+    exportReportStatus.textContent = "Le rapport PDF a été téléchargé.";
+  } catch (error) {
+    console.error("Impossible de générer le rapport PDF.", error);
+    exportReportStatus.textContent = "Le rapport PDF n’a pas pu être généré. Vérifiez votre connexion et réessayez.";
+  } finally {
+    exportReportButton.disabled = false;
+  }
+}
+
+exportReportButton.addEventListener("click", exportWatchReport);
 
 navToggle.addEventListener("click", () => {
   setNavigationOpen(navToggle.getAttribute("aria-expanded") !== "true");
