@@ -110,22 +110,22 @@ window.RDC_DAILY_UPDATES = {
     {
       "name": "OMS Afrique",
       "state": "updated",
-      "message": "2 recent publication(s) found."
+      "message": "2 publications récentes trouvées."
     },
     {
       "name": "ReliefWeb",
       "state": "updated",
-      "message": "11 recent publication(s) found."
+      "message": "11 publications récentes trouvées."
     },
     {
       "name": "GNews",
       "state": "not_configured",
-      "message": "Add the corresponding API key to GitHub secrets to enable this feed."
+      "message": "Ajoutez la clé d’API correspondante aux secrets GitHub pour activer ce flux."
     },
     {
       "name": "NewsData.io",
       "state": "not_configured",
-      "message": "Add the corresponding API key to GitHub secrets to enable this feed."
+      "message": "Ajoutez la clé d’API correspondante aux secrets GitHub pour activer ce flux."
     }
   ]
 };

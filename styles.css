@@ -1544,6 +1544,9 @@ h1 span {
 
 .daily-source-status {
   margin: 0 0 12px;
+}
+
+.daily-source-status.is-warning {
   color: #a45b32;
 }
 

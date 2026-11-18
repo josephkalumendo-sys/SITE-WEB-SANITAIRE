@@ -491,9 +491,15 @@ function renderDailyUpdates() {
     .map((source) => source.state === "not_configured"
       ? `${source.name} non configuré`
       : `${source.name} indisponible aujourd’hui`);
-  dailySourceStatus.textContent = unavailable.length
-    ? `Flux facultatifs ou indisponibles : ${unavailable.join(" · ")}.`
-    : "";
+  const sourceMessages = sourceResults
+    .filter((source) => typeof source.name === "string" && typeof source.message === "string")
+    .map((source) => `${source.name} : ${source.message}`);
+  dailySourceStatus.textContent = sourceMessages.length
+    ? sourceMessages.join(" · ")
+    : unavailable.length
+      ? `Flux facultatifs ou indisponibles : ${unavailable.join(" · ")}.`
+      : "";
+  dailySourceStatus.classList.toggle("is-warning", unavailable.length > 0);
 
   const items = updates.items.filter((item) =>
     item && typeof item.title === "string" &&

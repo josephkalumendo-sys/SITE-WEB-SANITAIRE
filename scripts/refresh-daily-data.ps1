@@ -73,13 +73,13 @@ function Add-RssSource {
     $sourceStatuses.Add([pscustomobject]@{
       name = $SourceName
       state = "updated"
-      message = "$added recent publication(s) found."
+      message = if ($added -eq 1) { "1 publication récente trouvée." } else { "$added publications récentes trouvées." }
     })
   } catch {
     $sourceStatuses.Add([pscustomobject]@{
       name = $SourceName
       state = "error"
-      message = "This source could not be refreshed today."
+      message = "Cette source n’a pas pu être actualisée aujourd’hui."
     })
     Write-Warning "$SourceName did not respond; request details are not logged."
     if ($Required) {
@@ -101,7 +101,7 @@ function Add-NewsApiSource {
     $sourceStatuses.Add([pscustomobject]@{
       name = $SourceName
       state = "not_configured"
-      message = "Add the corresponding API key to GitHub secrets to enable this feed."
+      message = "Ajoutez la clé d’API correspondante aux secrets GitHub pour activer ce flux."
     })
     return
   }
@@ -149,13 +149,13 @@ function Add-NewsApiSource {
     $sourceStatuses.Add([pscustomobject]@{
       name = $SourceName
       state = "updated"
-      message = "$added recent publication(s) found."
+      message = if ($added -eq 1) { "1 publication récente trouvée." } else { "$added publications récentes trouvées." }
     })
   } catch {
     $sourceStatuses.Add([pscustomobject]@{
       name = $SourceName
       state = "error"
-      message = "This API feed could not be refreshed today."
+      message = "Ce flux d’API n’a pas pu être actualisé aujourd’hui."
     })
     Write-Warning "$SourceName did not respond; request details are not logged."
   }
