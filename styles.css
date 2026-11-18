@@ -638,7 +638,6 @@ h1 span {
   min-height: 74px;
   padding: 13px 14px;
   border: 1px solid #f0e9e7;
-  border-top: 3px solid #b83b3b;
   border-radius: 9px;
   background: linear-gradient(180deg, #fff 0%, #fbf8f7 100%);
 }
