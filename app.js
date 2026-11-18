@@ -40,8 +40,14 @@ const analyticsSummary = document.getElementById("analytics-summary");
 const analyticsChartCanvas = document.getElementById("outbreak-chart");
 const exportReportButton = document.getElementById("export-report");
 const exportReportStatus = document.getElementById("export-report-status");
+const alertNotificationsToggle = document.getElementById("alert-notifications-toggle");
+const alertNotificationsStatus = document.getElementById("alert-notifications-status");
+const networkStatus = document.getElementById("network-status");
+const ALERT_NOTIFICATION_STORAGE_KEY = "rdc-health-alert-notifications";
 let selectedFeatureId = null;
 let outbreakChart = null;
+let offlineCacheReady = false;
+let offlineSupportError = false;
 const loadedSectionData = new Set();
 const sectionDataRequests = new Map();
 const dataScriptRequests = new Map();
@@ -114,6 +120,55 @@ function setNavigationOpen(isOpen) {
   navToggle.setAttribute("aria-label", isOpen ? "Fermer la navigation" : "Ouvrir la navigation");
   navBackdrop.hidden = !isOpen;
 }
+
+function updateNetworkStatus() {
+  const narrowScreen = window.matchMedia("(max-width: 560px)").matches;
+  const isOffline = !navigator.onLine;
+  networkStatus.classList.toggle("is-offline", isOffline || offlineSupportError);
+
+  if (offlineSupportError) {
+    networkStatus.textContent = narrowScreen
+      ? "Cache indisponible"
+      : "Mode hors ligne indisponible";
+  } else if (isOffline) {
+    networkStatus.textContent = narrowScreen
+      ? offlineCacheReady ? "Hors ligne" : "Cache non prêt"
+      : offlineCacheReady ? "Hors ligne · cache prêt" : "Hors ligne · cache non vérifié";
+  } else {
+    networkStatus.textContent = narrowScreen
+      ? offlineCacheReady ? "Prêt hors ligne" : "Préparation…"
+      : offlineCacheReady ? "Prêt hors ligne" : "Préparation hors ligne";
+  }
+}
+
+function initializeOfflineSupport() {
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
+  window.addEventListener("resize", updateNetworkStatus);
+
+  const isSecureOrigin = location.protocol === "https:" ||
+    ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+  if (!isSecureOrigin || !("serviceWorker" in navigator)) {
+    offlineSupportError = true;
+    updateNetworkStatus();
+    return;
+  }
+
+  updateNetworkStatus();
+  navigator.serviceWorker.register("./service-worker.js")
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => {
+      offlineCacheReady = true;
+      updateNetworkStatus();
+    })
+    .catch((error) => {
+      console.error("Impossible d’activer la consultation hors ligne.", error);
+      offlineSupportError = true;
+      updateNetworkStatus();
+    });
+}
+
+initializeOfflineSupport();
 
 function loadDataScript(source) {
   if (dataScriptRequests.has(source)) return dataScriptRequests.get(source);
@@ -216,6 +271,136 @@ async function initializeOutbreakAnalytics() {
 
 function getOutbreakRecords() {
   return Array.isArray(window.RDC_HEALTH_DATA) ? window.RDC_HEALTH_DATA : [];
+}
+
+function getAlertNotificationState() {
+  const saved = localStorage.getItem(ALERT_NOTIFICATION_STORAGE_KEY);
+  if (!saved) return { enabled: false, notifiedKeys: [] };
+
+  const state = JSON.parse(saved);
+  if (
+    !state ||
+    typeof state.enabled !== "boolean" ||
+    !Array.isArray(state.notifiedKeys) ||
+    state.notifiedKeys.some((key) => typeof key !== "string")
+  ) {
+    throw new Error("Les préférences de notification enregistrées sont invalides.");
+  }
+  return state;
+}
+
+function saveAlertNotificationState(state) {
+  localStorage.setItem(ALERT_NOTIFICATION_STORAGE_KEY, JSON.stringify(state));
+}
+
+function setAlertNotificationControl(enabled) {
+  alertNotificationsToggle.setAttribute("aria-pressed", String(enabled));
+  alertNotificationsToggle.textContent = enabled
+    ? "Désactiver les notifications web"
+    : "Activer les notifications web";
+}
+
+function activeHealthAlerts() {
+  return getOutbreakRecords().filter((record) =>
+    record.status === "confirmed" || record.status === "alert"
+  );
+}
+
+function alertNotificationKey(record) {
+  return JSON.stringify([
+    record.province,
+    record.disease,
+    record.status,
+    record.date,
+    record.source
+  ]);
+}
+
+function notifyNewHealthAlerts(state) {
+  if (!state.enabled || Notification.permission !== "granted") return 0;
+
+  let sentCount = 0;
+  activeHealthAlerts().forEach((record) => {
+    const key = alertNotificationKey(record);
+    if (state.notifiedKeys.includes(key)) return;
+
+    const notification = new Notification(`Alerte sanitaire officielle — ${record.province}`, {
+      body: `${record.disease} · ${record.status === "confirmed" ? "Confirmation officielle" : "Alerte à vérifier"}${record.provisional ? " · Données provisoires" : ""} · ${record.source} · ${formatPublicationDate(record.date)}`,
+      tag: key
+    });
+    notification.onclick = () => {
+      window.focus();
+      window.location.hash = "epidemies";
+    };
+    state.notifiedKeys.push(key);
+    saveAlertNotificationState(state);
+    sentCount += 1;
+  });
+  return sentCount;
+}
+
+function refreshAlertNotifications() {
+  if (!("Notification" in window)) {
+    setAlertNotificationControl(false);
+    alertNotificationsToggle.disabled = true;
+    alertNotificationsStatus.textContent = "Les notifications de navigateur ne sont pas prises en charge par ce navigateur.";
+    return;
+  }
+
+  alertNotificationsToggle.disabled = false;
+  try {
+    const state = getAlertNotificationState();
+    setAlertNotificationControl(state.enabled && Notification.permission === "granted");
+    if (state.enabled && Notification.permission === "granted") {
+      const sentCount = notifyNewHealthAlerts(state);
+      alertNotificationsStatus.textContent = sentCount
+        ? `${sentCount} nouvelle(s) alerte(s) officielle(s) signalée(s).`
+        : "Notifications activées. Aucune nouvelle alerte officielle active.";
+    } else if (state.enabled && Notification.permission === "denied") {
+      alertNotificationsStatus.textContent = "Autorisation refusée dans le navigateur. Modifiez ses paramètres de notification pour réactiver les alertes.";
+    }
+  } catch (error) {
+    console.error("Impossible de mettre à jour les notifications sanitaires.", error);
+    alertNotificationsStatus.textContent = "Impossible de lire ou d’enregistrer les préférences de notification dans ce navigateur.";
+  }
+}
+
+async function toggleAlertNotifications() {
+  if (!("Notification" in window)) {
+    alertNotificationsStatus.textContent = "Les notifications de navigateur ne sont pas prises en charge par ce navigateur.";
+    return;
+  }
+
+  try {
+    const state = getAlertNotificationState();
+    if (state.enabled && Notification.permission === "granted") {
+      state.enabled = false;
+      saveAlertNotificationState(state);
+      setAlertNotificationControl(false);
+      alertNotificationsStatus.textContent = "Notifications désactivées sur ce navigateur.";
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      setAlertNotificationControl(false);
+      alertNotificationsStatus.textContent = permission === "denied"
+        ? "Autorisation refusée. Vous pouvez la modifier dans les paramètres de votre navigateur."
+        : "Autorisation non accordée. Cliquez à nouveau et acceptez les notifications pour activer le suivi.";
+      return;
+    }
+
+    state.enabled = true;
+    saveAlertNotificationState(state);
+    setAlertNotificationControl(true);
+    const sentCount = notifyNewHealthAlerts(state);
+    alertNotificationsStatus.textContent = sentCount
+      ? `Notifications activées; ${sentCount} alerte(s) officielle(s) active(s) signalée(s).`
+      : "Notifications activées. Vous serez averti des nouvelles alertes officielles chargées.";
+  } catch (error) {
+    console.error("Impossible d’activer les notifications sanitaires.", error);
+    alertNotificationsStatus.textContent = "Impossible d’activer ou d’enregistrer les notifications dans ce navigateur.";
+  }
 }
 
 function getRecordsForChart() {
@@ -435,6 +620,7 @@ async function exportWatchReport() {
 }
 
 exportReportButton.addEventListener("click", exportWatchReport);
+alertNotificationsToggle.addEventListener("click", toggleAlertNotifications);
 
 navToggle.addEventListener("click", () => {
   setNavigationOpen(navToggle.getAttribute("aria-expanded") !== "true");
@@ -632,6 +818,7 @@ function formatPublicationDate(value) {
 }
 
 function renderOutbreakSection() {
+  refreshAlertNotifications();
   const records = Array.isArray(window.RDC_HEALTH_DATA)
     ? window.RDC_HEALTH_DATA.filter((record) =>
       record.status === "confirmed" || record.status === "alert" || record.status === "historical"

@@ -25,3 +25,11 @@ Les publications automatiques affichent leur source et leur date. Elles n’actu
 La rubrique **Épidémies et alertes** propose un graphique interactif qui reprend les repères de la carte, regroupés par province et type d’information, avec des filtres de 3, 6 ou 12 mois selon la date de publication. Un repère est une information sourcée, pas un cas; le contexte provincial et les indicateurs ne confirment pas une épidémie dans une ville.
 
 Le bouton **Télécharger le rapport PDF** génère un rapport local incluant les alertes officielles et les actualités disponibles, avec leurs sources et dates de publication. Les informations humanitaires ou médiatiques y sont explicitement présentées comme non confirmatoires. Chart.js et jsPDF sont chargés depuis un CDN au besoin; une connexion Internet est nécessaire pour ces fonctions.
+
+## Notifications d’alertes
+
+Dans **Épidémies et alertes**, l’utilisateur peut autoriser les notifications du navigateur. Les alertes et confirmations officielles actives présentes dans les données sont signalées une fois par navigateur; les informations historiques et les articles de presse sont exclus. Les préférences sont conservées localement. Le site étant statique, il ne vérifie les alertes que lorsque la page est ouverte et les données de la rubrique sont chargées : les notifications Web Push en arrière-plan ne sont pas disponibles. L’envoi de SMS nécessite un serveur et une passerelle SMS, qui ne sont pas configurés; aucun numéro de téléphone n’est recueilli.
+
+## Consultation hors connexion
+
+Après une première visite en ligne sur la version HTTPS, le site met en cache son interface, la carte et les données sanitaires locales pour les visites suivantes hors connexion. Attendez l’indication **Prêt hors ligne** avant de quitter la page. Les liens vers des sources externes, les recherches d’actualités en direct et les fonctions reposant sur des bibliothèques chargées depuis un CDN nécessitent encore Internet. Le site peut être installé depuis le menu du navigateur lorsqu’il est ouvert en HTTPS.

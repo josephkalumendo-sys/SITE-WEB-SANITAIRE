@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f7f4">
     <title>Veille sanitaire — RD Congo</title>
+    <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -44,6 +45,7 @@
             <span aria-hidden="true">☰</span>
           </button>
           <span class="topbar-title">Tableau de bord sanitaire</span>
+          <span class="network-status" id="network-status" role="status" aria-live="polite">Vérification du mode hors ligne…</span>
           <span class="country-tag"><span class="country-dot"></span> RD Congo</span>
         </header>
 
@@ -250,6 +252,16 @@
           <h2 id="outbreak-title">Épidémies et alertes</h2>
           <p>Les statuts et dates ci-dessous proviennent des publications citées; une alerte n’équivaut pas à une confirmation.</p>
         </div>
+        <section class="notification-panel" aria-labelledby="notification-title">
+          <div>
+            <p class="eyebrow">Notifications web</p>
+            <h3 id="notification-title">Suivre les alertes officielles actives</h3>
+            <p>Autorisez les notifications de ce navigateur pour être averti des nouvelles alertes ou confirmations officielles chargées sur ce site. Les informations historiques sont exclues.</p>
+          </div>
+          <button type="button" id="alert-notifications-toggle" aria-pressed="false">Activer les notifications web</button>
+          <p class="notification-status" id="alert-notifications-status" role="status" aria-live="polite"></p>
+          <p class="notification-note">Le site doit être ouvert pour vérifier les données. Les notifications push en arrière-plan et l’envoi de SMS nécessitent un serveur et un service d’envoi qui ne sont pas configurés; aucun numéro de téléphone n’est collecté.</p>
+        </section>
         <section class="analytics-panel" aria-labelledby="analytics-title">
           <div class="analytics-heading">
             <div>
@@ -372,6 +384,11 @@
           <p>Consultez toujours la publication d’origine pour sa date, sa zone de couverture et ses mises à jour.</p>
         </div>
         <div class="resource-grid">
+          <article class="resource-card">
+            <h3>Consulter hors connexion</h3>
+            <p>Ouvrez le site une première fois avec Internet; attendez l’indication « hors ligne prêt », puis revenez-y sans connexion. Sur HTTPS, vous pouvez aussi installer le site depuis le menu de votre navigateur.</p>
+            <p>Les données sanitaires locales et la carte sont mises en cache. Les liens externes, les recherches d’actualités en direct et les fonctions qui chargent des bibliothèques depuis Internet peuvent rester indisponibles.</p>
+          </article>
           <article class="resource-card">
             <h3>Sources officielles</h3>
             <a href="https://www.who.int/countries/cod" target="_blank" rel="noopener noreferrer">Organisation mondiale de la Santé (OMS) ↗</a>
