@@ -288,7 +288,7 @@ analyticsPeriod.addEventListener("change", () => {
   renderOutbreakChart();
 });
 
-function addPdfText(doc, text, options = {}) {
+function addPdfText(doc, text, layout, options = {}) {
   const margin = 16;
   const pageHeight = doc.internal.pageSize.getHeight();
   const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
@@ -297,12 +297,12 @@ function addPdfText(doc, text, options = {}) {
   doc.setFontSize(fontSize);
   const lines = doc.splitTextToSize(String(text || ""), maxWidth);
   const lineHeight = fontSize * 0.5;
-  if (options.y + lines.length * lineHeight > pageHeight - margin) {
+  if (layout.y + lines.length * lineHeight > pageHeight - margin) {
     doc.addPage();
-    options.y = margin;
+    layout.y = margin;
   }
-  doc.text(lines, margin, options.y);
-  options.y += lines.length * lineHeight + (options.gap || 4);
+  doc.text(lines, margin, layout.y);
+  layout.y += lines.length * lineHeight + (options.gap || 4);
 }
 
 function addPdfSourceLink(doc, label, url, options) {
@@ -363,66 +363,51 @@ async function exportWatchReport() {
       media: "Média — non confirmatoire"
     };
 
-    addPdfText(doc, "Rapport de veille sanitaire — République démocratique du Congo", {
-      ...layout, fontSize: 16, bold: true, gap: 7
+    addPdfText(doc, "Rapport de veille sanitaire — République démocratique du Congo", layout, {
+      fontSize: 16, bold: true, gap: 7
     });
-    layout.y = 31;
     addPdfText(doc, `Généré le ${new Intl.DateTimeFormat("fr-FR", {
       dateStyle: "long",
       timeStyle: "short"
-    }).format(new Date())}`, { ...layout, fontSize: 9, gap: 8 });
-    layout.y += 4;
-    addPdfText(doc, "Ce rapport rassemble les informations disponibles dans l’application au moment de sa génération. Les sources humanitaires et médiatiques ne constituent pas une confirmation officielle d’épidémie. Les informations historiques ne décrivent pas nécessairement la situation actuelle.", {
-      ...layout, fontSize: 10, gap: 8
+    }).format(new Date())}`, layout, { fontSize: 9, gap: 8 });
+    addPdfText(doc, "Ce rapport rassemble les informations disponibles dans l’application au moment de sa génération. Les sources humanitaires et médiatiques ne constituent pas une confirmation officielle d’épidémie. Les informations historiques ne décrivent pas nécessairement la situation actuelle.", layout, {
+      fontSize: 10, gap: 8
     });
 
-    addPdfText(doc, "Épidémies et alertes — sources officielles", {
-      ...layout, fontSize: 13, bold: true, gap: 6
+    addPdfText(doc, "Épidémies et alertes — sources officielles", layout, {
+      fontSize: 13, bold: true, gap: 6
     });
-    layout.y += 26;
     if (!records.length) {
-      addPdfText(doc, "Aucune information officielle datée n’est disponible.", {
-        ...layout, fontSize: 10
-      });
+      addPdfText(doc, "Aucune information officielle datée n’est disponible.", layout, { fontSize: 10 });
     }
     records.forEach((record) => {
-      addPdfText(doc, `${record.disease} — ${statusLabels[record.status]}`, {
-        ...layout, fontSize: 11, bold: true, gap: 5
+      addPdfText(doc, `${record.disease} — ${statusLabels[record.status]}`, layout, {
+        fontSize: 11, bold: true, gap: 5
       });
-      layout.y += 19;
-      addPdfText(doc, `Zone : ${record.province} · Source : ${record.source} · Publication : ${formatPublicationDate(record.date)}`, {
-        ...layout, fontSize: 9, gap: 4
+      addPdfText(doc, `Zone : ${record.province} · Source : ${record.source} · Publication : ${formatPublicationDate(record.date)}`, layout, {
+        fontSize: 9, gap: 4
       });
-      layout.y += 16;
       if (record.note) {
-        addPdfText(doc, record.note, { ...layout, fontSize: 9, gap: 4 });
-        layout.y += 16;
+        addPdfText(doc, record.note, layout, { fontSize: 9, gap: 4 });
       }
       addPdfSourceLink(doc, "Consulter la source officielle", record.url, layout);
-      layout.y += 2;
     });
 
-    addPdfText(doc, "Publications récentes — contexte et veille", {
-      ...layout, fontSize: 13, bold: true, gap: 6
+    addPdfText(doc, "Publications récentes — contexte et veille", layout, {
+      fontSize: 13, bold: true, gap: 6
     });
-    layout.y += 26;
     if (!updates.length) {
-      addPdfText(doc, "Aucune publication récente n’est disponible dans les flux chargés.", {
-        ...layout, fontSize: 10
-      });
+      addPdfText(doc, "Aucune publication récente n’est disponible dans les flux chargés.", layout, { fontSize: 10 });
     }
     updates.forEach((item) => {
-      addPdfText(doc, item.titleFr || item.title, {
-        ...layout, fontSize: 10, bold: true, gap: 5
+      addPdfText(doc, item.titleFr || item.title, layout, {
+        fontSize: 10, bold: true, gap: 5
       });
-      layout.y += 18;
       const category = categoryLabels[item.category] || "Publication sanitaire";
-      addPdfText(doc, `${category} · Source : ${item.source || "Non précisée"} · Publication : ${formatPublicationDate(item.publishedAt)}`, {
-        ...layout, fontSize: 9, gap: 4
+      addPdfText(doc, `${category} · Source : ${item.source || "Non précisée"} · Publication : ${formatPublicationDate(item.publishedAt)}`, layout, {
+        fontSize: 9, gap: 4
       });
-      layout.y += 16;
       addPdfSourceLink(doc, "Consulter la publication", item.url, layout);
-      layout.y += 2;
     });
 
     doc.save(`rapport-veille-sanitaire-rdc-${new Date().toISOString().slice(0, 10)}.pdf`);
