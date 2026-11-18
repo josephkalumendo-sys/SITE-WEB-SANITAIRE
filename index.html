@@ -254,7 +254,7 @@
           <div class="analytics-heading">
             <div>
               <p class="eyebrow">Analyse des publications</p>
-              <h3 id="analytics-title">Informations officielles par période</h3>
+              <h3 id="analytics-title">Repères de la carte par province</h3>
             </div>
             <label for="analytics-period">Période
               <select id="analytics-period">
@@ -264,9 +264,9 @@
               </select>
             </label>
           </div>
-          <p class="analytics-note">Le graphique compte les publications officielles par date de publication et par statut. Il ne représente ni le nombre de cas ni une évolution de l’incidence; les données historiques ne décrivent pas la situation actuelle.</p>
+          <p class="analytics-note">Le graphique reprend les localités et repères affichés sur la carte, regroupés par province et type d’information. La période filtre la date de publication. Un repère n’équivaut pas à un cas : le contexte provincial et l’indicateur VIH ne confirment pas une épidémie dans une ville.</p>
           <div class="analytics-chart-wrap">
-            <canvas id="outbreak-chart" role="img" aria-label="Nombre de publications officielles par mois, ventilées par statut"></canvas>
+            <canvas id="outbreak-chart" role="img" aria-label="Nombre de repères cartographiques par province et type d’information"></canvas>
           </div>
           <p class="analytics-summary" id="analytics-summary" role="status" aria-live="polite"></p>
           <div class="report-export">
