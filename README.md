@@ -22,6 +22,6 @@ Les publications automatiques affichent leur source et leur date. Elles n’actu
 
 ## Graphiques et rapports PDF
 
-La rubrique **Épidémies et alertes** propose un graphique interactif du nombre de publications officielles chargées par mois, ventilées selon leur statut, sur une période de 3, 6 ou 12 mois. Ce décompte porte sur les publications, pas sur les cas ni sur l’incidence; les données historiques ne décrivent pas la situation actuelle.
+La rubrique **Épidémies et alertes** propose un graphique interactif qui reprend les repères de la carte, regroupés par province et type d’information, avec des filtres de 3, 6 ou 12 mois selon la date de publication. Un repère est une information sourcée, pas un cas; le contexte provincial et les indicateurs ne confirment pas une épidémie dans une ville.
 
 Le bouton **Télécharger le rapport PDF** génère un rapport local incluant les alertes officielles et les actualités disponibles, avec leurs sources et dates de publication. Les informations humanitaires ou médiatiques y sont explicitement présentées comme non confirmatoires. Chart.js et jsPDF sont chargés depuis un CDN au besoin; une connexion Internet est nécessaire pour ces fonctions.

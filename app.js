@@ -265,7 +265,7 @@ function renderOutbreakChart() {
   if (outbreakChart) outbreakChart.destroy();
   outbreakChart = new window.Chart(analyticsChartCanvas, {
     type: "bar",
-    data: { labels, datasets },
+    data: { labels: provinces, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
