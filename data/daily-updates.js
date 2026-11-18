@@ -1,5 +1,5 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-18T01:13:30.5780019+00:00",
+  "updatedAt": "2026-11-18T04:57:00.7152580+00:00",
   "items": [
     {
       "title": "DR Congo: Six months on, accessing hard-to-reach communities key to halting Ebola outbreak",
