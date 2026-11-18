@@ -250,6 +250,31 @@
           <h2 id="outbreak-title">Épidémies et alertes</h2>
           <p>Les statuts et dates ci-dessous proviennent des publications citées; une alerte n’équivaut pas à une confirmation.</p>
         </div>
+        <section class="analytics-panel" aria-labelledby="analytics-title">
+          <div class="analytics-heading">
+            <div>
+              <p class="eyebrow">Analyse des publications</p>
+              <h3 id="analytics-title">Informations officielles par période</h3>
+            </div>
+            <label for="analytics-period">Période
+              <select id="analytics-period">
+                <option value="3">3 derniers mois</option>
+                <option value="6">6 derniers mois</option>
+                <option value="12" selected>12 derniers mois</option>
+              </select>
+            </label>
+          </div>
+          <p class="analytics-note">Le graphique compte les publications officielles par date de publication et par statut. Il ne représente ni le nombre de cas ni une évolution de l’incidence; les données historiques ne décrivent pas la situation actuelle.</p>
+          <div class="analytics-chart-wrap">
+            <canvas id="outbreak-chart" role="img" aria-label="Nombre de publications officielles par mois, ventilées par statut"></canvas>
+          </div>
+          <p class="analytics-summary" id="analytics-summary" role="status" aria-live="polite"></p>
+          <div class="report-export">
+            <button type="button" id="export-report">Télécharger le rapport PDF</button>
+            <p id="export-report-status" role="status" aria-live="polite" hidden></p>
+          </div>
+          <p class="analytics-note">Le rapport regroupe les informations officielles, les publications humanitaires et les actualités disponibles, avec leurs sources et dates. Les publications humanitaires et médiatiques ne confirment pas une épidémie.</p>
+        </section>
         <div class="outbreak-grid" id="outbreak-list" aria-live="polite"></div>
       </section>
 
