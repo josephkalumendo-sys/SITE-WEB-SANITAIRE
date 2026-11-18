@@ -182,7 +182,7 @@ async function initializeOutbreakSection() {
 }
 
 const chartScriptUrl = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
-const pdfScriptUrl = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js";
+const pdfScriptUrl = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 
 async function initializeOutbreakAnalytics() {
   try {
