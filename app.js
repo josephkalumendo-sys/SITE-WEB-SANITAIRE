@@ -210,8 +210,12 @@ function getRecordsForChart() {
   const monthCount = Number(analyticsPeriod.value);
   const currentMonth = new Date();
   currentMonth.setDate(1);
-  currentMonth.setHours(0, 0, 0, 0);
+  currentMonth.setMonth(currentMonth.getMonth() + 1);
+  currentMonth.setDate(0);
+  currentMonth.setHours(23, 59, 59, 999);
   const firstMonth = new Date(currentMonth);
+  firstMonth.setDate(1);
+  firstMonth.setHours(0, 0, 0, 0);
   firstMonth.setMonth(firstMonth.getMonth() - monthCount + 1);
   const statuses = ["confirmed", "alert", "historical"];
   const records = getOutbreakRecords().filter((record) => {
