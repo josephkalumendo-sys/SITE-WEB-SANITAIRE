@@ -183,10 +183,22 @@ async function initializeOutbreakSection() {
 
 const chartScriptUrl = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
 const pdfScriptUrl = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+const mapMarkerStatuses = [
+  { key: "ongoing", label: "Transmission signalée", color: "#b4232f" },
+  { key: "controlled", label: "Foyer initial contrôlé", color: "#25815a" },
+  { key: "community", label: "Action communautaire", color: "#3676a7" },
+  { key: "provincial", label: "Contexte provincial", color: "#607989" },
+  { key: "access", label: "Accès à la riposte entravé", color: "#a76b21" },
+  { key: "indicator", label: "Indicateur provincial", color: "#7054a0" },
+  { key: "other", label: "Autre information cartographiée", color: "#aab5ae" }
+];
 
 async function initializeOutbreakAnalytics() {
   try {
-    await loadDataScript(chartScriptUrl);
+    await Promise.all([
+      loadDataScript("data/city-health-data.js"),
+      loadDataScript(chartScriptUrl)
+    ]);
     if (typeof window.Chart !== "function") {
       throw new Error("Chart.js n’est pas disponible après le chargement du script.");
     }
@@ -217,47 +229,38 @@ function getRecordsForChart() {
   firstMonth.setDate(1);
   firstMonth.setHours(0, 0, 0, 0);
   firstMonth.setMonth(firstMonth.getMonth() - monthCount + 1);
-  const statuses = ["confirmed", "alert", "historical"];
-  const records = getOutbreakRecords().filter((record) => {
-    if (!statuses.includes(record.status) || !record.date) return false;
+  const records = (Array.isArray(window.RDC_CITY_HEALTH_DATA)
+    ? window.RDC_CITY_HEALTH_DATA
+    : []).filter((record) => {
+    if (!record.date) return false;
     const date = new Date(record.date);
     return !Number.isNaN(date.getTime()) && date >= firstMonth && date <= currentMonth;
   });
-  const months = Array.from({ length: monthCount }, (_, index) => {
-    const month = new Date(firstMonth);
-    month.setMonth(firstMonth.getMonth() + index);
-    return month;
-  });
-
-  return { records, months };
+  const provinces = [...new Set(records.map((record) => record.province))]
+    .sort((a, b) => a.localeCompare(b, "fr"));
+  return { records, provinces };
 }
 
 function renderOutbreakChart() {
-  const { records, months } = getRecordsForChart();
-  const labels = months.map((month) => new Intl.DateTimeFormat("fr-FR", {
-    month: "short",
-    year: "2-digit"
-  }).format(month));
-  const statuses = [
-    { key: "confirmed", label: "Confirmations officielles", color: "#b83b3b" },
-    { key: "alert", label: "Alertes officielles", color: "#d59b42" },
-    { key: "historical", label: "Informations historiques", color: "#aab5ae" }
-  ];
-  const datasets = statuses.map((status) => ({
+  const { records, provinces } = getRecordsForChart();
+  const knownStatuses = mapMarkerStatuses
+    .filter((status) => status.key !== "other")
+    .map((status) => status.key);
+  const datasets = mapMarkerStatuses.map((status) => ({
     label: status.label,
-    data: months.map((month) => records.filter((record) => {
-      if (record.status !== status.key) return false;
-      const date = new Date(record.date);
-      return date.getFullYear() === month.getFullYear() &&
-        date.getMonth() === month.getMonth();
-    }).length),
+    data: provinces.map((province) => records.filter((record) =>
+      record.province === province && (
+        status.key === "other"
+          ? !knownStatuses.includes(record.status)
+          : record.status === status.key
+      )
+    ).length),
     backgroundColor: status.color,
     borderRadius: 4
   }));
-  const totals = statuses.map((status) => ({
-    label: status.label,
-    count: records.filter((record) => record.status === status.key).length
-  }));
+  const provinceTotals = provinces.map((province) =>
+    `${province} : ${records.filter((record) => record.province === province).length}`
+  );
 
   if (outbreakChart) outbreakChart.destroy();
   outbreakChart = new window.Chart(analyticsChartCanvas, {
@@ -268,8 +271,15 @@ function renderOutbreakChart() {
       maintainAspectRatio: false,
       interaction: { intersect: false, mode: "index" },
       plugins: {
-        legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 8 } },
-        tooltip: { callbacks: { label: (context) => `${context.dataset.label} : ${context.parsed.y}` } }
+        legend: {
+          position: "bottom",
+          labels: { usePointStyle: true, boxWidth: 8, padding: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.dataset.label} : ${context.parsed.y} repère(s)`
+          }
+        }
       },
       scales: {
         x: { stacked: true, grid: { display: false } },
@@ -277,14 +287,14 @@ function renderOutbreakChart() {
           stacked: true,
           beginAtZero: true,
           ticks: { precision: 0, stepSize: 1 },
-          title: { display: true, text: "Nombre de publications" }
+          title: { display: true, text: "Nombre de repères cartographiques" }
         }
       }
     }
   });
   analyticsSummary.textContent = records.length
-    ? totals.map((item) => `${item.label} : ${item.count}`).join(" · ")
-    : "Aucune publication officielle datée dans la période sélectionnée. Cela ne signifie pas qu’aucun cas n’a été signalé.";
+    ? `${records.length} repères cartographiques · ${provinceTotals.join(" · ")}`
+    : "Aucun repère daté dans la période sélectionnée. Cela ne signifie pas qu’aucun événement sanitaire n’a été signalé.";
 }
 
 analyticsPeriod.addEventListener("change", () => {
