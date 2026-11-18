@@ -7,6 +7,20 @@ if ($rootOverride) {
   $projectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 }
 $outputPath = Join-Path $projectRoot "data\daily-updates.js"
+$existingTitleTranslations = @{}
+if (Test-Path -LiteralPath $outputPath) {
+  $existingContent = [System.IO.File]::ReadAllText($outputPath)
+  if ($existingContent -match '(?s)^\s*window\.RDC_DAILY_UPDATES\s*=\s*(\{.*\})\s*;\s*$') {
+    $existingUpdates = ConvertFrom-Json -InputObject $Matches[1]
+  } else {
+    throw "Le fichier des publications existant n’a pas le format attendu."
+  }
+  foreach ($existingItem in @($existingUpdates.items)) {
+    if ($existingItem.url -and $existingItem.titleFr) {
+      $existingTitleTranslations[[string]$existingItem.url] = [string]$existingItem.titleFr
+    }
+  }
+}
 $now = [DateTimeOffset]::UtcNow
 $cutoff = $now.AddDays(-30)
 $articles = [System.Collections.Generic.List[object]]::new()
@@ -61,6 +75,7 @@ function Add-RssSource {
 
       $articles.Add([pscustomobject]@{
         title = $title
+        titleFr = if ($existingTitleTranslations.ContainsKey($articleUrl)) { $existingTitleTranslations[$articleUrl] } else { $null }
         url = $articleUrl
         publishedAt = $publishedAt.ToString("o")
         source = $SourceName
@@ -137,6 +152,7 @@ function Add-NewsApiSource {
       }
       $articles.Add([pscustomobject]@{
         title = $title
+        titleFr = if ($existingTitleTranslations.ContainsKey($articleUrl)) { $existingTitleTranslations[$articleUrl] } else { $null }
         url = $articleUrl
         publishedAt = $publishedAt.ToString("o")
         source = $SourceName

@@ -536,7 +536,7 @@ function renderDailyUpdates() {
     link.href = item.url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = item.title;
+    link.textContent = item.titleFr || item.title;
 
     const meta = document.createElement("p");
     meta.className = "daily-news-meta";
