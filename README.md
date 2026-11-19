@@ -41,7 +41,7 @@ Les favoris locaux existants sont importés au premier chargement d’un compte.
 
 ## Graphiques et rapports PDF
 
-La rubrique **Épidémies et alertes** propose un graphique interactif qui reprend les repères de la carte, regroupés par province et type d’information, avec des filtres de 3, 6 ou 12 mois selon la date de publication. Un repère est une information sourcée, pas un cas; le contexte provincial et les indicateurs ne confirment pas une épidémie dans une ville.
+La rubrique **Épidémies et alertes** propose un graphique interactif qui reprend les repères de la carte, regroupés par province et type d’information, avec des filtres de 3, 6 ou 12 mois selon la date de publication. À chaque collecte quotidienne, les publications épidémiques officielles sont examinées pour repérer les provinces nommées explicitement. Une nouvelle région mentionnée apparaît en alerte orange sur la carte et dans le graphique, avec sa source et sa date; cette détection automatique doit être vérifiée et ne vaut pas confirmation de transmission. Les sources médiatiques ou humanitaires ne créent pas de signal cartographique officiel. Un repère est une information sourcée, pas un cas; le contexte provincial et les indicateurs ne confirment pas une épidémie dans une ville.
 
 Le bouton **Télécharger le rapport PDF** génère un rapport local incluant les alertes officielles et les actualités disponibles, avec leurs sources et dates de publication. Les informations humanitaires ou médiatiques y sont explicitement présentées comme non confirmatoires. Chart.js et jsPDF sont chargés depuis un CDN au besoin; une connexion Internet est nécessaire pour ces fonctions.
 

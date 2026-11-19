@@ -1010,7 +1010,8 @@ function isEpidemicPublication(item) {
 
 function applyOfficialEpidemicRegions(items) {
   const knownProvinces = new Set((window.RDC_PROVINCES?.features || []).map(getProvinceName));
-  const alreadyActive = new Set((window.RDC_HEALTH_DATA || [])
+  const officialRecords = Array.isArray(window.RDC_HEALTH_DATA) ? window.RDC_HEALTH_DATA : [];
+  const alreadyActive = new Set(officialRecords
     .filter((record) => record.status === "confirmed" || record.status === "alert")
     .map((record) => provinceNames[record.province] || record.province));
   const latestByProvince = new Map();
