@@ -1151,8 +1151,9 @@ function renderDailyNewsItems() {
     favoriteButton.setAttribute("aria-pressed", String(isFavorite));
     favoriteButton.setAttribute("aria-busy", String(isSaving));
     favoriteButton.disabled = isSaving;
-    favoriteButton.setAttribute("aria-label", `${isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"} : ${item.titleFr || item.title}`);
-    favoriteButton.textContent = isFavorite ? "★ Retirer des favoris" : "☆ Ajouter aux favoris";
+    favoriteButton.setAttribute("aria-label", `${isFavorite ? "Décocher le favori" : "Cocher comme favori"} : ${item.titleFr || item.title}`);
+    favoriteButton.textContent = isFavorite ? "★ Décocher" : "☆ Cocher comme favori";
+    favoriteButton.title = isFavorite ? "Cliquer pour décocher ce favori" : "Cliquer pour ajouter ce favori";
     favoriteButton.addEventListener("click", () => toggleFavorite(item));
 
     card.append(category, link, meta, note, favoriteButton);
