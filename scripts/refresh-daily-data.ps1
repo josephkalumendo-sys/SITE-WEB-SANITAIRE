@@ -63,7 +63,7 @@ function Get-MentionedProvinces {
   $mentioned = [System.Collections.Generic.List[string]]::new()
   foreach ($province in ($provinceAliases.Keys | Sort-Object)) {
     $aliases = @($provinceAliases[$province] | ForEach-Object { [Regex]::Escape($_) })
-    $pattern = "(?i)(?<![\p{L}\p{N}])(?:$($aliases -join '|'))(?![\p{L}\p{N}])"
+    $pattern = "(?i)(?<![\p{L}\p{N}-])(?:$($aliases -join '|'))(?![\p{L}\p{N}-])"
     if ($Text -match $pattern) {
       $mentioned.Add($province)
     }

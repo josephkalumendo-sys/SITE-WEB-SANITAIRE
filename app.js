@@ -465,7 +465,7 @@ function getRecordsForChart() {
   firstMonth.setDate(1);
   firstMonth.setHours(0, 0, 0, 0);
   firstMonth.setMonth(firstMonth.getMonth() - monthCount + 1);
-  const cityRecords = Array.isArray(window.RDC_CITY_HEALTH_DATA)
+  const cityRecords = (Array.isArray(window.RDC_CITY_HEALTH_DATA)
     ? window.RDC_CITY_HEALTH_DATA
     : []).filter((record) => {
     if (!record.date) return false;
