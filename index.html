@@ -233,6 +233,27 @@
         </aside>
       </section>
       <section class="daily-news" aria-labelledby="daily-news-title">
+        <section class="account-panel" aria-labelledby="account-title">
+          <div class="account-heading">
+            <div>
+              <p class="eyebrow">Espace personnel</p>
+              <h3 id="account-title">Compte et favoris</h3>
+            </div>
+            <p id="account-status" role="status" aria-live="polite">Vérification de la configuration du compte…</p>
+          </div>
+          <form class="account-form" id="account-form">
+            <label for="account-email">Adresse e-mail</label>
+            <input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+            <label for="account-password">Mot de passe</label>
+            <input id="account-password" name="password" type="password" autocomplete="current-password" minlength="8" required>
+            <div class="account-actions">
+              <button type="submit" name="auth-action" value="sign-in">Se connecter</button>
+              <button type="submit" name="auth-action" value="sign-up">Créer un compte</button>
+              <button type="button" id="account-sign-out" hidden>Se déconnecter</button>
+            </div>
+          </form>
+          <p class="account-privacy">Votre adresse e-mail et vos favoris sont gérés par votre projet Supabase; les mots de passe sont traités par Supabase Auth et ne sont pas enregistrés par le site. N’inscrivez aucune donnée de santé ou information sur des patients dans les favoris.</p>
+        </section>
         <div class="daily-news-heading">
           <div>
             <p class="eyebrow">Veille actualisée automatiquement</p>
@@ -242,6 +263,36 @@
         </div>
         <p class="daily-news-note">Sources officielles, humanitaires et médiatiques. Les articles médiatiques et humanitaires ne confirment pas une épidémie; les couleurs et statuts de la carte ne changent qu’après vérification officielle.</p>
         <p class="daily-source-status" id="daily-source-status"></p>
+        <form class="news-filters" id="daily-news-filters" role="search" aria-label="Rechercher et filtrer les publications">
+          <label class="news-filter-search" for="daily-news-search">Recherche
+            <input id="daily-news-search" type="search" placeholder="Mot-clé, maladie, lieu, éditeur…" autocomplete="off">
+          </label>
+          <label for="daily-news-source">Source
+            <select id="daily-news-source">
+              <option value="">Toutes les sources</option>
+            </select>
+          </label>
+          <label for="daily-news-category">Rubrique
+            <select id="daily-news-category">
+              <option value="">Toutes les rubriques</option>
+              <option value="official">Officielle</option>
+              <option value="humanitarian">Humanitaire</option>
+              <option value="media">Médiatique · non confirmatoire</option>
+            </select>
+          </label>
+          <label for="daily-news-from">Du
+            <input id="daily-news-from" type="date">
+          </label>
+          <label for="daily-news-to">Au
+            <input id="daily-news-to" type="date">
+          </label>
+          <label class="favorites-only-filter" for="daily-news-favorites">
+            <input id="daily-news-favorites" type="checkbox">
+            Mes favoris seulement
+          </label>
+          <button type="reset" class="news-filter-reset">Effacer les filtres</button>
+        </form>
+        <p class="news-filter-count" id="daily-news-filter-count" role="status" aria-live="polite"></p>
         <div class="daily-news-grid" id="daily-news-feed" aria-live="polite"></div>
       </section>
       </section>
@@ -442,6 +493,7 @@
     </div>
     <button class="nav-backdrop" id="nav-backdrop" type="button" aria-label="Fermer la navigation" hidden></button>
 
+    <script src="data/supabase-config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

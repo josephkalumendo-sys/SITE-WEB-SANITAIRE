@@ -16,9 +16,23 @@ Le workflow GitHub Actions `.github/workflows/actualisation-quotidienne.yml` col
 
 GNews et NewsData.io sont facultatifs. Pour les activer, ajoutez leurs clés dans **Settings → Secrets and variables → Actions** sous les noms `GNEWS_API_KEY` et `NEWSDATA_API_KEY`. Ne placez jamais ces clés dans les fichiers du site.
 
+Pour activer la troisième source choisie, créez une clé GNews puis ajoutez-la au dépôt GitHub dans **Settings → Secrets and variables → Actions → New repository secret**, sous le nom exact `GNEWS_API_KEY`. La clé est lue uniquement par le workflow quotidien; ne l’inscrivez jamais dans le code ou dans le chat. Lancez ensuite **Actions → Actualisation quotidienne des sources sanitaires → Run workflow** pour vérifier la collecte. Le flux GNews est médiatique et ne confirme pas une épidémie.
+
 Pour la première publication, sélectionnez **Settings → Pages → Build and deployment → GitHub Actions**, puis lancez le workflow manuellement.
 
 Les publications automatiques affichent leur source et leur date. Elles n’actualisent pas automatiquement les confirmations, alertes ni couleurs de la carte : ces statuts doivent rester fondés sur une vérification officielle, et un article médiatique ou humanitaire ne confirme pas une épidémie.
+
+## Recherche et filtres
+
+Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent.
+
+## Comptes Supabase et favoris
+
+Créez un projet Supabase, puis recopiez son **Project URL** et sa clé **publishable/anon** dans `data/supabase-config.js`. Cette clé est publique dans une application statique; n’utilisez jamais la clé `service_role` ou une clé secrète côté navigateur. Exécutez `supabase/schema.sql` dans l’éditeur SQL du projet pour créer la table des favoris et ses règles Row Level Security (RLS). Les politiques limitent chaque compte à ses propres favoris.
+
+Dans les paramètres d’authentification Supabase, activez la confirmation des e-mails et ajoutez l’URL du site GitHub Pages aux URL de redirection autorisées. La connexion, la création de compte, la déconnexion et les favoris nécessitent HTTPS et Internet. Supabase Auth gère les mots de passe; le site ne les enregistre pas. Les favoris sont synchronisés avec le compte après connexion. Ne désactivez pas RLS.
+
+La configuration Supabase est volontairement laissée vide jusqu’à ce que le projet soit créé. La clé publique anon/publishable est visible des visiteurs sur GitHub Pages et ne donne aucun droit privilégié lorsque RLS est correctement configuré; les favoris restent privés au compte authentifié. N’ajoutez jamais de clé `service_role`.
 
 ## Graphiques et rapports PDF
 

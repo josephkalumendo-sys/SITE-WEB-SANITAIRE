@@ -30,6 +30,17 @@ const newsResults = document.getElementById("news-results");
 const dailyNewsFeed = document.getElementById("daily-news-feed");
 const dailyUpdateStatus = document.getElementById("daily-update-status");
 const dailySourceStatus = document.getElementById("daily-source-status");
+const dailyNewsFilters = document.getElementById("daily-news-filters");
+const dailyNewsSearch = document.getElementById("daily-news-search");
+const dailyNewsSource = document.getElementById("daily-news-source");
+const dailyNewsCategory = document.getElementById("daily-news-category");
+const dailyNewsFrom = document.getElementById("daily-news-from");
+const dailyNewsTo = document.getElementById("daily-news-to");
+const dailyNewsFavoritesOnly = document.getElementById("daily-news-favorites");
+const dailyNewsFilterCount = document.getElementById("daily-news-filter-count");
+const accountStatus = document.getElementById("account-status");
+const accountForm = document.getElementById("account-form");
+const accountSignOut = document.getElementById("account-sign-out");
 const emptyState = document.getElementById("empty-state");
 const settingsToggle = document.getElementById("settings-toggle");
 const settingsForm = document.getElementById("settings-form");
@@ -46,6 +57,10 @@ const networkStatus = document.getElementById("network-status");
 const ALERT_NOTIFICATION_STORAGE_KEY = "rdc-health-alert-notifications";
 let selectedFeatureId = null;
 let outbreakChart = null;
+let dailyNewsItems = [];
+let supabaseClient = null;
+let accountUser = null;
+let favoriteArticles = new Map();
 let offlineCacheReady = false;
 let offlineSupportError = false;
 const loadedSectionData = new Set();
@@ -242,6 +257,7 @@ async function initializeActualitesSection() {
   ]);
   loadProvinces();
   loadDailyUpdates();
+  initializeSupabaseFeatures();
 }
 
 async function initializeOutbreakSection() {
@@ -926,12 +942,126 @@ function createNewsCard(title, articles, sourceName) {
   return card;
 }
 
-function renderDailyUpdates() {
+const dailyCategoryLabels = {
+  official: "Source officielle",
+  humanitarian: "Source humanitaire",
+  media: "Média · non confirmatoire"
+};
+const dailyCategoryNotes = {
+  official: "Publication officielle; elle ne modifie pas automatiquement le statut affiché sur la carte.",
+  humanitarian: "Publication humanitaire; elle ne constitue pas une confirmation officielle d’épidémie.",
+  media: "Information médiatique; elle ne constitue pas une confirmation officielle d’épidémie."
+};
+
+function updateDailyNewsSources(items) {
+  const selectedSource = dailyNewsSource.value;
+  const sources = [...new Set(items.map((item) => item.source).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "fr"));
+  dailyNewsSource.replaceChildren(new Option("Toutes les sources", ""));
+  sources.forEach((source) => dailyNewsSource.add(new Option(source, source)));
+  if (sources.includes(selectedSource)) {
+    dailyNewsSource.value = selectedSource;
+  }
+}
+
+function getFilteredDailyNewsItems() {
+  const search = dailyNewsSearch.value.trim().toLocaleLowerCase("fr");
+  const from = dailyNewsFrom.value;
+  const to = dailyNewsTo.value;
+  const sourceItems = dailyNewsFavoritesOnly.checked
+    ? [...favoriteArticles.values()]
+    : dailyNewsItems;
+  return sourceItems.filter((item) => {
+    const searchableText = [
+      item.title,
+      item.titleFr,
+      item.source,
+      item.publisher,
+      dailyCategoryLabels[item.category]
+    ].filter(Boolean).join(" ").toLocaleLowerCase("fr");
+    if (search && !searchableText.includes(search)) return false;
+    if (dailyNewsSource.value && item.source !== dailyNewsSource.value) return false;
+    if (dailyNewsCategory.value && item.category !== dailyNewsCategory.value) return false;
+    if (from || to) {
+      const publishedDate = new Date(item.publishedAt);
+      if (Number.isNaN(publishedDate.getTime())) return false;
+      const dateKey = publishedDate.toISOString().slice(0, 10);
+      if (from && dateKey < from) return false;
+      if (to && dateKey > to) return false;
+    }
+    return true;
+  });
+}
+
+function renderDailyNewsItems() {
+  const items = getFilteredDailyNewsItems();
   dailyNewsFeed.replaceChildren();
+  updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
+  const totalItems = dailyNewsFavoritesOnly.checked
+    ? accountUser ? favoriteArticles.size : 0
+    : dailyNewsItems.length;
+  dailyNewsFilterCount.textContent = `${items.length} publication${items.length === 1 ? "" : "s"} affichée${items.length === 1 ? "" : "s"} sur ${totalItems}.`;
+
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "daily-news-empty";
+    empty.textContent = dailyNewsFavoritesOnly.checked && !accountUser
+      ? "Connectez-vous pour afficher vos favoris."
+      : dailyNewsFavoritesOnly.checked
+        ? "Vous n’avez pas encore de favoris correspondant aux filtres sélectionnés."
+        : dailyNewsItems.length
+          ? "Aucune publication ne correspond aux filtres sélectionnés."
+          : "Aucune publication récente n’est disponible dans les flux chargés.";
+    dailyNewsFeed.appendChild(empty);
+    return;
+  }
+
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = `daily-news-card daily-news-${item.category || "other"}`;
+
+    const category = document.createElement("span");
+    category.className = "daily-news-category";
+    category.textContent = dailyCategoryLabels[item.category] || "Publication sanitaire";
+
+    const link = document.createElement("a");
+    link.href = item.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = item.titleFr || item.title;
+
+    const meta = document.createElement("p");
+    meta.className = "daily-news-meta";
+    const publisher = item.publisher && item.publisher !== item.source
+      ? ` · ${item.publisher}`
+      : "";
+    meta.textContent = `Source : ${item.source || "Non précisée"}${publisher} · Publication : ${formatPublicationDate(item.publishedAt)}`;
+
+    const note = document.createElement("p");
+    note.className = "daily-news-meta";
+    note.textContent = dailyCategoryNotes[item.category] || dailyCategoryNotes.humanitarian;
+
+    const favoriteButton = document.createElement("button");
+    favoriteButton.className = "favorite-toggle";
+    favoriteButton.type = "button";
+    const isFavorite = favoriteArticles.has(item.url);
+    favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    favoriteButton.setAttribute("aria-label", `${isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"} : ${item.titleFr || item.title}`);
+    favoriteButton.textContent = isFavorite ? "★ Dans mes favoris" : "☆ Ajouter aux favoris";
+    favoriteButton.addEventListener("click", () => toggleFavorite(item, favoriteButton));
+
+    card.append(category, link, meta, note, favoriteButton);
+    dailyNewsFeed.appendChild(card);
+  });
+}
+
+function renderDailyUpdates() {
   const updates = window.RDC_DAILY_UPDATES;
   if (!updates || !Array.isArray(updates.items)) {
     dailyUpdateStatus.textContent = "Le flux quotidien est indisponible.";
     dailySourceStatus.textContent = "Les autres informations du site restent consultables.";
+    dailyNewsItems = [];
+    renderDailyNewsItems();
     return;
   }
 
@@ -968,57 +1098,209 @@ function renderDailyUpdates() {
       : "";
   dailySourceStatus.classList.toggle("is-warning", unavailable.length > 0);
 
-  const items = updates.items.filter((item) =>
+  dailyNewsItems = updates.items.filter((item) =>
     item && typeof item.title === "string" &&
     typeof item.url === "string" && item.url.startsWith("https://")
   );
-  if (!items.length) {
-    const empty = document.createElement("p");
-    empty.className = "daily-news-empty";
-    empty.textContent = "Aucune publication récente n’a été trouvée dans les flux disponibles.";
-    dailyNewsFeed.appendChild(empty);
+  updateDailyNewsSources(dailyNewsItems);
+  renderDailyNewsItems();
+}
+
+dailyNewsFilters.addEventListener("input", renderDailyNewsItems);
+dailyNewsFilters.addEventListener("change", renderDailyNewsItems);
+dailyNewsFilters.addEventListener("reset", () => {
+  window.setTimeout(renderDailyNewsItems, 0);
+});
+
+function setAccountStatus(message, isError = false) {
+  accountStatus.textContent = message;
+  accountStatus.classList.toggle("is-error", isError);
+}
+
+function updateAccountControls() {
+  const isSignedIn = Boolean(accountUser);
+  accountForm.hidden = !supabaseClient || isSignedIn;
+  accountSignOut.hidden = !isSignedIn;
+  renderDailyNewsItems();
+}
+
+async function loadAccountFavorites() {
+  if (!supabaseClient || !accountUser) {
+    favoriteArticles = new Map();
+    return;
+  }
+  const { data, error } = await supabaseClient
+    .from("favorites")
+    .select("article_url, article_title, source, publisher, category, published_at");
+  if (error) throw error;
+  favoriteArticles = new Map(data.map((favorite) => [favorite.article_url, {
+    url: favorite.article_url,
+    title: favorite.article_title || favorite.article_url,
+    source: favorite.source,
+    publisher: favorite.publisher,
+    category: favorite.category,
+    publishedAt: favorite.published_at
+  }]));
+}
+
+async function applyAccountSession(session) {
+  accountUser = session?.user || null;
+  favoriteArticles = new Map();
+  updateAccountControls();
+  if (!accountUser) {
+    setAccountStatus("Connectez-vous ou créez un compte pour synchroniser vos favoris.");
     return;
   }
 
-  const categoryLabels = {
-    official: "Source officielle",
-    humanitarian: "Source humanitaire",
-    media: "Média · non confirmatoire"
-  };
-  const categoryNotes = {
-    official: "Publication officielle; elle ne modifie pas automatiquement le statut affiché sur la carte.",
-    humanitarian: "Publication humanitaire; elle ne constitue pas une confirmation officielle d’épidémie.",
-    media: "Information médiatique; elle ne constitue pas une confirmation officielle d’épidémie."
-  };
+  setAccountStatus(`Connecté : ${accountUser.email || "compte utilisateur"} · Chargement des favoris…`);
+  try {
+    await loadAccountFavorites();
+    setAccountStatus(`Connecté : ${accountUser.email || "compte utilisateur"} · ${favoriteArticles.size} favori(s).`);
+    renderDailyNewsItems();
+  } catch (error) {
+    console.error("Impossible de charger les favoris Supabase.", error);
+    setAccountStatus("Compte connecté, mais favoris indisponibles. Vérifiez la table et les règles RLS Supabase.", true);
+  }
+}
 
-  items.forEach((item) => {
-    const card = document.createElement("article");
-    card.className = `daily-news-card daily-news-${item.category || "other"}`;
+async function initializeSupabaseFeatures() {
+  const configuration = window.RDC_SUPABASE_CONFIG;
+  const url = typeof configuration?.url === "string" ? configuration.url.trim() : "";
+  const anonKey = typeof configuration?.anonKey === "string" ? configuration.anonKey.trim() : "";
+  if (!url || !anonKey) {
+    setAccountStatus("Comptes non configurés : renseignez l’URL Supabase et la clé anon publique dans data/supabase-config.js.");
+    accountForm.hidden = true;
+    return;
+  }
 
-    const category = document.createElement("span");
-    category.className = "daily-news-category";
-    category.textContent = categoryLabels[item.category] || "Publication sanitaire";
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol !== "https:" &&
+      !["localhost", "127.0.0.1"].includes(parsedUrl.hostname)) {
+      throw new Error("L’URL Supabase doit utiliser HTTPS.");
+    }
+    await loadDataScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1/dist/umd/supabase.js");
+    if (typeof window.supabase?.createClient !== "function") {
+      throw new Error("La bibliothèque cliente Supabase n’est pas disponible.");
+    }
 
-    const link = document.createElement("a");
-    link.href = item.url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = item.titleFr || item.title;
+    supabaseClient = window.supabase.createClient(url, anonKey);
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+    await applyAccountSession(data.session);
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      window.setTimeout(() => {
+        applyAccountSession(session).catch((error) => {
+          console.error("Impossible d’actualiser la session du compte.", error);
+          setAccountStatus("La session du compte n’a pas pu être actualisée.", true);
+        });
+      }, 0);
+    });
+  } catch (error) {
+    console.error("Impossible d’initialiser les comptes Supabase.", error);
+    setAccountStatus("Supabase est indisponible ou mal configuré. Vérifiez l’URL, la clé publique et votre connexion.", true);
+  }
+}
 
-    const meta = document.createElement("p");
-    meta.className = "daily-news-meta";
-    const publisher = item.publisher && item.publisher !== item.source
-      ? ` · ${item.publisher}`
-      : "";
-    meta.textContent = `Source : ${item.source || "Non précisée"}${publisher} · Publication : ${formatPublicationDate(item.publishedAt)}`;
+accountForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!supabaseClient) {
+    setAccountStatus("Configurez d’abord Supabase dans data/supabase-config.js.", true);
+    return;
+  }
+  if (!accountForm.reportValidity()) return;
 
-    const note = document.createElement("p");
-    note.className = "daily-news-meta";
-    note.textContent = categoryNotes[item.category] || categoryNotes.humanitarian;
+  const formData = new FormData(accountForm);
+  const email = String(formData.get("email") || "").trim();
+  const password = String(formData.get("password") || "");
+  const action = event.submitter?.value;
+  const submitButtons = [...accountForm.querySelectorAll('button[type="submit"]')];
+  submitButtons.forEach((button) => { button.disabled = true; });
+  setAccountStatus(action === "sign-up" ? "Création du compte…" : "Connexion…");
 
-    card.append(category, link, meta, note);
-    dailyNewsFeed.appendChild(card);
-  });
+  try {
+    const response = action === "sign-up"
+      ? await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: location.origin === "null"
+            ? undefined
+            : `${location.origin}${location.pathname}#actualites`
+        }
+      })
+      : await supabaseClient.auth.signInWithPassword({ email, password });
+    if (response.error) throw response.error;
+    if (action === "sign-up" && !response.data.session) {
+      setAccountStatus("Compte créé. Vérifiez votre boîte e-mail pour confirmer l’adresse avant de vous connecter.");
+    } else {
+      await applyAccountSession(response.data.session);
+    }
+  } catch (error) {
+    console.error("Échec de l’authentification Supabase.", error);
+    setAccountStatus(error.message || "L’authentification a échoué. Vérifiez les informations et la configuration Supabase.", true);
+  } finally {
+    submitButtons.forEach((button) => { button.disabled = false; });
+  }
+});
+
+accountSignOut.addEventListener("click", async () => {
+  if (!supabaseClient) return;
+  accountSignOut.disabled = true;
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+    await applyAccountSession(null);
+  } catch (error) {
+    console.error("Échec de la déconnexion Supabase.", error);
+    setAccountStatus("La déconnexion n’a pas abouti. Réessayez.", true);
+  } finally {
+    accountSignOut.disabled = false;
+  }
+});
+
+async function toggleFavorite(item, button) {
+  if (!accountUser || !supabaseClient) {
+    setAccountStatus(supabaseClient
+      ? "Connectez-vous pour enregistrer et synchroniser vos favoris."
+      : "Configurez Supabase avant d’enregistrer des favoris.", true);
+    document.getElementById("account-title").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  const wasFavorite = favoriteArticles.has(item.url);
+  button.disabled = true;
+  try {
+    const response = wasFavorite
+      ? await supabaseClient.from("favorites")
+        .delete()
+        .eq("user_id", accountUser.id)
+        .eq("article_url", item.url)
+      : await supabaseClient.from("favorites")
+        .insert({
+          user_id: accountUser.id,
+          article_url: item.url,
+          article_title: item.titleFr || item.title,
+          source: item.source || null,
+          publisher: item.publisher || null,
+          category: item.category || null,
+          published_at: item.publishedAt || null
+        });
+    if (response.error) throw response.error;
+    if (wasFavorite) favoriteArticles.delete(item.url);
+    else favoriteArticles.set(item.url, {
+      ...item,
+      title: item.titleFr || item.title
+    });
+    updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
+    setAccountStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans votre compte.`);
+    renderDailyNewsItems();
+  } catch (error) {
+    console.error("Impossible d’enregistrer le favori.", error);
+    setAccountStatus("Favori non enregistré. Vérifiez la table et les règles RLS Supabase.", true);
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function loadDailyUpdates() {
