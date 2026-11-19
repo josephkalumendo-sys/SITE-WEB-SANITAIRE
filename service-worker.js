@@ -1,4 +1,6 @@
-const CACHE_NAME = "veille-sanitaire-v1";
+const CACHE_NAME = "veille-sanitaire-v2";
+const DAILY_SYNC_TAG = "sync-daily-health-updates";
+const DAILY_UPDATES_URL = new URL("data/daily-updates.js", self.registration.scope);
 const APP_SHELL = [
   "./index.html",
   "./styles.css",
@@ -10,6 +12,24 @@ const APP_SHELL = [
   "./data/health-data.js",
   "./data/provinces-rdc.js"
 ];
+
+async function notifyClients(message) {
+  const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+  clients.forEach((client) => client.postMessage(message));
+}
+
+async function refreshDailyUpdates() {
+  const requestUrl = new URL(DAILY_UPDATES_URL);
+  requestUrl.searchParams.set("sync", Date.now().toString());
+  const response = await fetch(requestUrl, { cache: "no-store" });
+  if (!response.ok || response.type !== "basic") {
+    throw new Error(`Impossible d’actualiser les rapports (${response.status}).`);
+  }
+
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(DAILY_UPDATES_URL.href, response.clone());
+  await notifyClients({ type: "DAILY_UPDATES_SYNCED" });
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -31,6 +51,18 @@ self.addEventListener("activate", (event) => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === DAILY_SYNC_TAG) {
+    event.waitUntil(refreshDailyUpdates());
+  }
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SYNC_DAILY_UPDATES") {
+    event.waitUntil(refreshDailyUpdates());
+  }
 });
 
 self.addEventListener("fetch", (event) => {

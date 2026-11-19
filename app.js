@@ -141,10 +141,26 @@ function updateNetworkStatus() {
   }
 }
 
+function requestDailyUpdatesSync(registration) {
+  if (registration.sync && typeof registration.sync.register === "function") {
+    registration.sync.register("sync-daily-health-updates")
+      .catch((error) => console.error("Impossible de planifier la synchronisation des rapports.", error));
+  }
+
+  if (navigator.onLine && registration.active) {
+    registration.active.postMessage({ type: "SYNC_DAILY_UPDATES" });
+  }
+}
+
 function initializeOfflineSupport() {
   window.addEventListener("online", updateNetworkStatus);
   window.addEventListener("offline", updateNetworkStatus);
   window.addEventListener("resize", updateNetworkStatus);
+  navigator.serviceWorker?.addEventListener("message", (event) => {
+    if (event.data?.type === "DAILY_UPDATES_SYNCED" && loadedSectionData.has("actualites")) {
+      loadDailyUpdates();
+    }
+  });
 
   const isSecureOrigin = location.protocol === "https:" ||
     ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
@@ -157,9 +173,11 @@ function initializeOfflineSupport() {
   updateNetworkStatus();
   navigator.serviceWorker.register("./service-worker.js")
     .then(() => navigator.serviceWorker.ready)
-    .then(() => {
+    .then((registration) => {
       offlineCacheReady = true;
       updateNetworkStatus();
+      requestDailyUpdatesSync(registration);
+      window.addEventListener("online", () => requestDailyUpdatesSync(registration));
     })
     .catch((error) => {
       console.error("Impossible d’activer la consultation hors ligne.", error);
@@ -1006,7 +1024,7 @@ function renderDailyUpdates() {
 function loadDailyUpdates() {
   const script = document.createElement("script");
   const cacheDate = new Date().toISOString().slice(0, 10);
-  script.src = `data/daily-updates.js?date=${cacheDate}`;
+  script.src = `data/daily-updates.js?date=${cacheDate}&sync=${Date.now()}`;
   script.addEventListener("load", renderDailyUpdates, { once: true });
   script.addEventListener("error", () => {
     dailyUpdateStatus.textContent = "Le flux quotidien n’a pas pu être chargé.";
