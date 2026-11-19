@@ -28,6 +28,48 @@ $sourceStatuses = [System.Collections.Generic.List[object]]::new()
 $healthPattern = "(?i)\b(outbreak|epidemic|epidemi\w*|\u00E9pid\u00E9mi\w*|health|disease|Ebola|cholera|mpox|measles|polio|malaria|HIV|vaccin|sanitaire|sant(e|\u00E9)|maladie)\b"
 $drcPattern = "(?i)Democratic Republic of the Congo|DR Congo|\bDRC\b|\bRDC\b|Congo-Kinshasa|Kinshasa|Ituri|Lualaba|Haut-Katanga|Nord-Kivu|North Kivu|Sud-Kivu|South Kivu|Equateur|\u00C9quateur|Kasai|Kasa\u00EF|Kwilu|Tshopo"
 $epidemicPattern = "(?i)\b(outbreak\w*|epidem\w*|\u00E9pid\u00E9mi\w*|cluster\w* of (cases|infection\w*)|Ebola|Bundibugyo|chol[e\u00E9]ra|mpox|monkey\s?pox|variole du singe|measles|rougeole|polio\w*|poliomy[e\u00E9]lite|meningit\w*|fi[e\u00E8]vre jaune|yellow fever|peste|plague|dengue|chikungunya|Marburg|Rift Valley fever|fi[e\u00E8]vre h[e\u00E9]morragique|viral hemorrhagic fever)\b"
+$provinceAliases = @{
+  "Bas-Uele" = @("Bas-Uele", "Bas Uele", "Lower Uele")
+  "Équateur" = @("Équateur", "Equateur")
+  "Haut-Katanga" = @("Haut-Katanga", "Haut Katanga", "Upper Katanga")
+  "Haut-Lomami" = @("Haut-Lomami", "Haut Lomami", "Upper Lomami")
+  "Haut-Uele" = @("Haut-Uele", "Haut Uele", "Upper Uele")
+  "Ituri" = @("Ituri")
+  "Kasaï" = @("Kasaï", "Kasai")
+  "Kasaï-Central" = @("Kasaï-Central", "Kasai-Central", "Kasai Central", "Central Kasai")
+  "Kasaï-Oriental" = @("Kasaï-Oriental", "Kasai-Oriental", "Kasai Oriental", "East Kasai")
+  "Kinshasa" = @("Kinshasa")
+  "Kongo-Central" = @("Kongo-Central", "Kongo Central", "Bas-Congo", "Lower Congo")
+  "Kwango" = @("Kwango")
+  "Kwilu" = @("Kwilu")
+  "Lomami" = @("Lomami")
+  "Lualaba" = @("Lualaba")
+  "Mai-Ndombe" = @("Mai-Ndombe", "Mai Ndombe", "Maï-Ndombe", "Maï Ndombe")
+  "Maniema" = @("Maniema")
+  "Mongala" = @("Mongala")
+  "Nord-Kivu" = @("Nord-Kivu", "Nord Kivu", "North Kivu")
+  "Nord-Ubangi" = @("Nord-Ubangi", "Nord Ubangi", "North Ubangi")
+  "Sankuru" = @("Sankuru")
+  "Sud-Kivu" = @("Sud-Kivu", "Sud Kivu", "South Kivu")
+  "Sud-Ubangi" = @("Sud-Ubangi", "Sud Ubangi", "South Ubangi")
+  "Tanganyika" = @("Tanganyika")
+  "Tshopo" = @("Tshopo")
+  "Tshuapa" = @("Tshuapa")
+}
+
+function Get-MentionedProvinces {
+  param([Parameter(Mandatory = $true)][AllowEmptyString()][string]$Text)
+
+  $mentioned = [System.Collections.Generic.List[string]]::new()
+  foreach ($province in ($provinceAliases.Keys | Sort-Object)) {
+    $aliases = @($provinceAliases[$province] | ForEach-Object { [Regex]::Escape($_) })
+    $pattern = "(?i)(?<![\p{L}\p{N}])(?:$($aliases -join '|'))(?![\p{L}\p{N}])"
+    if ($Text -match $pattern) {
+      $mentioned.Add($province)
+    }
+  }
+  return $mentioned.ToArray()
+}
 
 function Add-RssSource {
   param(
@@ -91,6 +133,7 @@ function Add-RssSource {
         publisher = $SourceName
         category = $Category
         epidemicRelated = $true
+        provinces = @(Get-MentionedProvinces -Text $searchText)
       })
       $added++
     }
@@ -178,6 +221,7 @@ function Add-NewsApiSource {
         publisher = $publisher
         category = $Category
         epidemicRelated = $true
+        provinces = @(Get-MentionedProvinces -Text $searchText)
       })
       $added++
     }
