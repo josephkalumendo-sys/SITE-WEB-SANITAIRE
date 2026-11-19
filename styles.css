@@ -1760,6 +1760,119 @@ h1 span {
   background: #fff;
 }
 
+.account-panel {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #dfe9e1;
+  border-radius: 9px;
+  background: #f7faf7;
+}
+
+.account-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.account-heading .eyebrow {
+  margin-bottom: 5px;
+}
+
+.account-heading h3 {
+  margin-bottom: 0;
+  font-size: 15px;
+}
+
+#account-status,
+.account-privacy {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+#account-status {
+  margin: 3px 0 0;
+  text-align: right;
+}
+
+#account-status.is-error {
+  color: #a63333;
+}
+
+.account-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px 11px;
+  margin-top: 13px;
+}
+
+.account-form > label {
+  color: #52655c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.account-form > input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid #dfe7e1;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font: 11px "Segoe UI", Arial, sans-serif;
+}
+
+.account-form > input:focus-visible {
+  border-color: #75a88b;
+  outline: 3px solid rgba(46, 113, 88, 0.14);
+}
+
+.account-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.account-actions button,
+#account-sign-out {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #cbded1;
+  border-radius: 7px;
+  background: #edf4ef;
+  color: var(--green-dark);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-actions button:hover:not(:disabled),
+#account-sign-out:hover:not(:disabled) {
+  background: #e2eee6;
+}
+
+.account-actions button:disabled,
+#account-sign-out:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.account-actions button:focus-visible,
+#account-sign-out:focus-visible {
+  outline: 3px solid rgba(46, 113, 88, 0.28);
+  outline-offset: 2px;
+}
+
+.account-privacy {
+  margin: 10px 0 0;
+}
+
 .daily-news-heading {
   display: flex;
   align-items: flex-start;
