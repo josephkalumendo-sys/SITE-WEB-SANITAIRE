@@ -1043,7 +1043,7 @@ function renderDailyNewsItems() {
     favoriteButton.setAttribute("aria-pressed", String(isFavorite));
     favoriteButton.setAttribute("aria-label", `${isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"} : ${item.titleFr || item.title}`);
     favoriteButton.textContent = isFavorite ? "★ Dans mes favoris" : "☆ Ajouter aux favoris";
-    favoriteButton.addEventListener("click", () => toggleFavorite(item, favoriteButton));
+    favoriteButton.addEventListener("click", () => toggleFavorite(item));
 
     card.append(category, link, meta, note, favoriteButton);
     dailyNewsFeed.appendChild(card);
