@@ -63,6 +63,7 @@ let selectedFeatureId = null;
 let outbreakChart = null;
 let dailyNewsItems = [];
 let favoriteArticles = new Map();
+const pendingFavoriteUrls = new Set();
 let localFavoriteArticles = new Map();
 let localFavoritesLoaded = false;
 const FAVORITES_STORAGE_KEY = "rdc-health-favorites";
@@ -1146,7 +1147,10 @@ function renderDailyNewsItems() {
     favoriteButton.className = "favorite-toggle";
     favoriteButton.type = "button";
     const isFavorite = favoriteArticles.has(item.url);
+    const isSaving = pendingFavoriteUrls.has(item.url);
     favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    favoriteButton.setAttribute("aria-busy", String(isSaving));
+    favoriteButton.disabled = isSaving;
     favoriteButton.setAttribute("aria-label", `${isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"} : ${item.titleFr || item.title}`);
     favoriteButton.textContent = isFavorite ? "★ Dans mes favoris" : "☆ Ajouter aux favoris";
     favoriteButton.addEventListener("click", () => toggleFavorite(item));
@@ -1491,8 +1495,11 @@ async function toggleFavorite(item) {
     return;
   }
 
-  const nextFavorites = new Map(favoriteArticles);
-  const isFavorite = nextFavorites.has(item.url);
+  if (pendingFavoriteUrls.has(item.url)) return;
+
+  const userId = accountUser.id;
+  const isFavorite = favoriteArticles.has(item.url);
+  const previousFavorite = favoriteArticles.get(item.url);
   const favorite = {
     url: item.url,
     title: item.titleFr || item.title,
@@ -1502,20 +1509,38 @@ async function toggleFavorite(item) {
     publishedAt: item.publishedAt || ""
   };
 
+  pendingFavoriteUrls.add(item.url);
+  const optimisticFavorites = new Map(favoriteArticles);
+  if (isFavorite) optimisticFavorites.delete(item.url);
+  else optimisticFavorites.set(item.url, favorite);
+  favoriteArticles = optimisticFavorites;
+  setFavoriteStorageStatus("Enregistrement des favoris…");
+  renderDailyNewsItems();
+
   try {
-    const request = isFavorite
+    const { error } = isFavorite
       ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
       : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite));
-    const { error } = await request;
     if (error) throw error;
-    if (isFavorite) nextFavorites.delete(item.url);
-    else nextFavorites.set(item.url, favorite);
-    favoriteArticles = nextFavorites;
-    setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
-    renderDailyNewsItems();
+    const result = await (isFavorite
+      ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
+      : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite)));
+    if (result.error) throw result.error;
+    if (accountUser && accountUser.id === userId) {
+      setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
+    }
   } catch (error) {
     console.error("Impossible de modifier ce favori dans Supabase.", error);
-    setFavoriteStorageStatus(`Le favori n’a pas pu être synchronisé : ${error.message}`, true);
+    if (accountUser && accountUser.id === userId) {
+      const restoredFavorites = new Map(favoriteArticles);
+      if (isFavorite) restoredFavorites.set(item.url, previousFavorite || favorite);
+      else restoredFavorites.delete(item.url);
+      favoriteArticles = restoredFavorites;
+      setFavoriteStorageStatus(`Le favori n’a pas pu être synchronisé : ${error.message}`, true);
+    }
+  } finally {
+    pendingFavoriteUrls.delete(item.url);
+    renderDailyNewsItems();
   }
 }
 
