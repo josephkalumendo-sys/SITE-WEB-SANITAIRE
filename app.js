@@ -38,9 +38,7 @@ const dailyNewsFrom = document.getElementById("daily-news-from");
 const dailyNewsTo = document.getElementById("daily-news-to");
 const dailyNewsFavoritesOnly = document.getElementById("daily-news-favorites");
 const dailyNewsFilterCount = document.getElementById("daily-news-filter-count");
-const accountStatus = document.getElementById("account-status");
-const accountForm = document.getElementById("account-form");
-const accountSignOut = document.getElementById("account-sign-out");
+const favoriteStorageStatus = document.getElementById("favorite-storage-status");
 const emptyState = document.getElementById("empty-state");
 const settingsToggle = document.getElementById("settings-toggle");
 const settingsForm = document.getElementById("settings-form");
@@ -58,9 +56,8 @@ const ALERT_NOTIFICATION_STORAGE_KEY = "rdc-health-alert-notifications";
 let selectedFeatureId = null;
 let outbreakChart = null;
 let dailyNewsItems = [];
-let supabaseClient = null;
-let accountUser = null;
 let favoriteArticles = new Map();
+const FAVORITES_STORAGE_KEY = "rdc-health-favorites";
 let offlineCacheReady = false;
 let offlineSupportError = false;
 const loadedSectionData = new Set();
@@ -256,8 +253,8 @@ async function initializeActualitesSection() {
     loadDataScript("data/city-health-data.js")
   ]);
   loadProvinces();
+  loadLocalFavorites();
   loadDailyUpdates();
-  initializeSupabaseFeatures();
 }
 
 async function initializeOutbreakSection() {
@@ -998,20 +995,18 @@ function renderDailyNewsItems() {
   dailyNewsFeed.replaceChildren();
   updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
   const totalItems = dailyNewsFavoritesOnly.checked
-    ? accountUser ? favoriteArticles.size : 0
+    ? favoriteArticles.size
     : dailyNewsItems.length;
   dailyNewsFilterCount.textContent = `${items.length} publication${items.length === 1 ? "" : "s"} affichée${items.length === 1 ? "" : "s"} sur ${totalItems}.`;
 
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "daily-news-empty";
-    empty.textContent = dailyNewsFavoritesOnly.checked && !accountUser
-      ? "Connectez-vous pour afficher vos favoris."
-      : dailyNewsFavoritesOnly.checked
-        ? "Vous n’avez pas encore de favoris correspondant aux filtres sélectionnés."
-        : dailyNewsItems.length
-          ? "Aucune publication ne correspond aux filtres sélectionnés."
-          : "Aucune publication récente n’est disponible dans les flux chargés.";
+    empty.textContent = dailyNewsFavoritesOnly.checked
+      ? "Aucun favori ne correspond aux filtres sélectionnés."
+      : dailyNewsItems.length
+        ? "Aucune publication ne correspond aux filtres sélectionnés."
+        : "Aucune publication récente n’est disponible dans les flux chargés.";
     dailyNewsFeed.appendChild(empty);
     return;
   }
