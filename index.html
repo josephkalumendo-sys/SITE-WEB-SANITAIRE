@@ -233,6 +233,28 @@
         </aside>
       </section>
       <section class="daily-news" aria-labelledby="daily-news-title">
+        <section class="account-panel" aria-labelledby="account-title">
+          <div class="account-heading">
+            <div>
+              <p class="eyebrow">Favoris synchronisés</p>
+              <h3 id="account-title">Compte utilisateur</h3>
+            </div>
+            <p id="account-status" role="status" aria-live="polite">Vérification de la configuration du compte…</p>
+          </div>
+          <form class="account-form" id="account-form">
+            <label for="account-email">Adresse e-mail</label>
+            <input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+            <label for="account-password">Mot de passe</label>
+            <input id="account-password" name="password" type="password" autocomplete="current-password" minlength="8" required>
+            <div class="account-actions">
+              <button type="submit" data-auth-action="sign-in">Se connecter</button>
+              <button type="submit" data-auth-action="sign-up">Créer un compte</button>
+              <button type="button" id="account-reset-password">Mot de passe oublié</button>
+            </div>
+          </form>
+          <button type="button" id="account-sign-out" hidden>Se déconnecter</button>
+          <p class="account-privacy">Supabase Auth gère les mots de passe; le site ne les stocke pas. Vos favoris sont privés au compte connecté et synchronisés entre appareils. N’enregistrez aucune donnée de patient.</p>
+        </section>
         <div class="daily-news-heading">
           <div>
             <p class="eyebrow">Veille actualisée automatiquement</p>
@@ -271,7 +293,7 @@
           </label>
           <button type="reset" class="news-filter-reset">Effacer les filtres</button>
         </form>
-        <p class="favorite-storage-status" id="favorite-storage-status" role="status" aria-live="polite">Les favoris sont enregistrés uniquement dans ce navigateur.</p>
+        <p class="favorite-storage-status" id="favorite-storage-status" role="status" aria-live="polite">Les favoris sont enregistrés dans ce navigateur ou synchronisés à votre compte après connexion.</p>
         <p class="news-filter-count" id="daily-news-filter-count" role="status" aria-live="polite"></p>
         <div class="daily-news-grid" id="daily-news-feed" aria-live="polite"></div>
       </section>
@@ -473,6 +495,7 @@
     </div>
     <button class="nav-backdrop" id="nav-backdrop" type="button" aria-label="Fermer la navigation" hidden></button>
 
+    <script src="data/supabase-config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
