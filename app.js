@@ -1152,7 +1152,7 @@ function renderDailyNewsItems() {
     favoriteButton.setAttribute("aria-busy", String(isSaving));
     favoriteButton.disabled = isSaving;
     favoriteButton.setAttribute("aria-label", `${isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"} : ${item.titleFr || item.title}`);
-    favoriteButton.textContent = isFavorite ? "★ Dans mes favoris" : "☆ Ajouter aux favoris";
+    favoriteButton.textContent = isFavorite ? "★ Retirer des favoris" : "☆ Ajouter aux favoris";
     favoriteButton.addEventListener("click", () => toggleFavorite(item));
 
     card.append(category, link, meta, note, favoriteButton);
