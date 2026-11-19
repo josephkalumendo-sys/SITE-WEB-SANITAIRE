@@ -24,7 +24,7 @@ Les publications automatiques affichent leur source et leur date. Elles n’actu
 
 ## Recherche et filtres
 
-Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent.
+Dans **Actualités sanitaires**, seules les publications liées à une épidémie sont conservées dans le flux. La collecte vérifie les titres et descriptions avec des termes d’épidémie et de maladies suivies; les publications sanitaires générales ou sans rapport avec une épidémie sont écartées. Le flux se filtre ensuite par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent.
 
 ## Comptes et favoris synchronisés
 

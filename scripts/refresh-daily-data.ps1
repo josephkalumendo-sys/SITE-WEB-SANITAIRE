@@ -27,6 +27,7 @@ $articles = [System.Collections.Generic.List[object]]::new()
 $sourceStatuses = [System.Collections.Generic.List[object]]::new()
 $healthPattern = "(?i)\b(outbreak|epidemic|epidemi\w*|\u00E9pid\u00E9mi\w*|health|disease|Ebola|cholera|mpox|measles|polio|malaria|HIV|vaccin|sanitaire|sant(e|\u00E9)|maladie)\b"
 $drcPattern = "(?i)Democratic Republic of the Congo|DR Congo|\bDRC\b|\bRDC\b|Congo-Kinshasa|Kinshasa|Ituri|Lualaba|Haut-Katanga|Nord-Kivu|North Kivu|Sud-Kivu|South Kivu|Equateur|\u00C9quateur|Kasai|Kasa\u00EF|Kwilu|Tshopo"
+$epidemicPattern = "(?i)\b(outbreak\w*|epidem\w*|\u00E9pid\u00E9mi\w*|cluster\w* of (cases|infection\w*)|Ebola|Bundibugyo|chol[e\u00E9]ra|mpox|monkey\s?pox|variole du singe|measles|rougeole|polio\w*|poliomy[e\u00E9]lite|meningit\w*|fi[e\u00E8]vre jaune|yellow fever|peste|plague|dengue|chikungunya|Marburg|Rift Valley fever|fi[e\u00E8]vre h[e\u00E9]morragique|viral hemorrhagic fever)\b"
 
 function Add-RssSource {
   param(
@@ -35,6 +36,7 @@ function Add-RssSource {
     [Parameter(Mandatory = $true)][string]$Category,
     [Parameter(Mandatory = $true)][string]$HealthFilter,
     [Parameter(Mandatory = $true)][string]$LocationFilter,
+    [Parameter(Mandatory = $true)][string]$EpidemicFilter,
     [switch]$Required
   )
 
@@ -48,7 +50,14 @@ function Add-RssSource {
 
     foreach ($item in @($feed.SelectNodes("/rss/channel/item"))) {
       $title = [System.Net.WebUtility]::HtmlDecode([string]$item.title).Trim()
-      if ($title -notmatch $HealthFilter -or $title -notmatch $LocationFilter) {
+      $descriptionNode = $item.SelectSingleNode("./description")
+      $description = if ($descriptionNode) {
+        [System.Net.WebUtility]::HtmlDecode([string]$descriptionNode.InnerText)
+      } else {
+        ""
+      }
+      $searchText = "$title $description"
+      if ($searchText -notmatch $HealthFilter -or $searchText -notmatch $LocationFilter -or $searchText -notmatch $EpidemicFilter) {
         continue
       }
 
@@ -81,6 +90,7 @@ function Add-RssSource {
         source = $SourceName
         publisher = $SourceName
         category = $Category
+        epidemicRelated = $true
       })
       $added++
     }
@@ -135,7 +145,7 @@ function Add-NewsApiSource {
         [string]$record.description
         [string]$record.content
       ) -join " "
-      if ($searchText -notmatch $healthPattern -or $searchText -notmatch $drcPattern) {
+      if ($searchText -notmatch $healthPattern -or $searchText -notmatch $drcPattern -or $searchText -notmatch $epidemicPattern) {
         continue
       }
 
@@ -167,6 +177,7 @@ function Add-NewsApiSource {
         source = $SourceName
         publisher = $publisher
         category = $Category
+        epidemicRelated = $true
       })
       $added++
     }
@@ -188,8 +199,8 @@ function Add-NewsApiSource {
 
 $whoUrl = "https://www.afro.who.int/rss.xml"
 $reliefWebUrl = "https://reliefweb.int/updates/rss.xml?search=Democratic%20Republic%20of%20the%20Congo%20health"
-Add-RssSource -Url $whoUrl -SourceName "OMS Afrique" -Category "official" -HealthFilter $healthPattern -LocationFilter $drcPattern -Required
-Add-RssSource -Url $reliefWebUrl -SourceName "ReliefWeb" -Category "humanitarian" -HealthFilter $healthPattern -LocationFilter $drcPattern
+Add-RssSource -Url $whoUrl -SourceName "OMS Afrique" -Category "official" -HealthFilter $healthPattern -LocationFilter $drcPattern -EpidemicFilter $epidemicPattern -Required
+Add-RssSource -Url $reliefWebUrl -SourceName "ReliefWeb" -Category "humanitarian" -HealthFilter $healthPattern -LocationFilter $drcPattern -EpidemicFilter $epidemicPattern
 
 $gnewsKey = [Environment]::GetEnvironmentVariable("GNEWS_API_KEY")
 if ($gnewsKey) {

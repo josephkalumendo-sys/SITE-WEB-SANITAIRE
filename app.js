@@ -961,6 +961,16 @@ const dailyCategoryNotes = {
   humanitarian: "Publication humanitaire; elle ne constitue pas une confirmation officielle d’épidémie.",
   media: "Information médiatique; elle ne constitue pas une confirmation officielle d’épidémie."
 };
+const epidemicPublicationPattern = /\b(?:outbreak\w*|epidem\w*|cluster\w* of (?:cases|infection\w*)|ebola|bundibugyo|cholera|mpox|monkey\s?pox|variole du singe|measles|rougeole|polio\w*|poliomyelite|meningit\w*|fievre jaune|yellow fever|peste|plague|dengue|chikungunya|marburg|rift valley fever|fievre hemorragique|viral hemorrhagic fever)\b/i;
+
+function isEpidemicPublication(item) {
+  if (item.epidemicRelated === true) return true;
+  const searchableText = `${item.title || ""} ${item.titleFr || ""}`
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  return epidemicPublicationPattern.test(searchableText);
+}
 
 function updateDailyNewsSources(items) {
   const selectedSource = dailyNewsSource.value;
@@ -981,6 +991,7 @@ function getFilteredDailyNewsItems() {
     ? [...favoriteArticles.values()]
     : dailyNewsItems;
   return sourceItems.filter((item) => {
+    if (!isEpidemicPublication(item)) return false;
     const searchableText = [
       item.title,
       item.titleFr,
@@ -1006,9 +1017,10 @@ function renderDailyNewsItems() {
   const items = getFilteredDailyNewsItems();
   dailyNewsFeed.replaceChildren();
   updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
-  const totalItems = dailyNewsFavoritesOnly.checked
-    ? favoriteArticles.size
-    : dailyNewsItems.length;
+  const sourceItems = dailyNewsFavoritesOnly.checked
+    ? [...favoriteArticles.values()]
+    : dailyNewsItems;
+  const totalItems = sourceItems.filter(isEpidemicPublication).length;
   dailyNewsFilterCount.textContent = `${items.length} publication${items.length === 1 ? "" : "s"} affichée${items.length === 1 ? "" : "s"} sur ${totalItems}.`;
 
   if (!items.length) {
@@ -1107,7 +1119,8 @@ function renderDailyUpdates() {
 
   dailyNewsItems = updates.items.filter((item) =>
     item && typeof item.title === "string" &&
-    typeof item.url === "string" && item.url.startsWith("https://")
+    typeof item.url === "string" && item.url.startsWith("https://") &&
+    isEpidemicPublication(item)
   );
   updateDailyNewsSources(dailyNewsItems);
   renderDailyNewsItems();
