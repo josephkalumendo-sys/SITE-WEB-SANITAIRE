@@ -10,8 +10,7 @@ const APP_SHELL = [
   "./data/city-health-data.js",
   "./data/daily-updates.js",
   "./data/health-data.js",
-  "./data/provinces-rdc.js",
-  "./data/supabase-config.js"
+  "./data/provinces-rdc.js"
 ];
 
 async function notifyClients(message) {
