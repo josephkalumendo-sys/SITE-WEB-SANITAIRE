@@ -64,6 +64,9 @@ function Get-MentionedProvinces {
   foreach ($province in ($provinceAliases.Keys | Sort-Object)) {
     $aliases = @($provinceAliases[$province] | ForEach-Object { [Regex]::Escape($_) })
     $pattern = "(?i)(?<![\p{L}\p{N}-])(?:$($aliases -join '|'))(?![\p{L}\p{N}-])"
+    if ($province -eq "Kasaï") {
+      $pattern += "(?![\s-]+(?:Central|Oriental)\b)"
+    }
     if ($Text -match $pattern) {
       $mentioned.Add($province)
     }
