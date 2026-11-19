@@ -24,15 +24,7 @@ Les publications automatiques affichent leur source et leur date. Elles n’actu
 
 ## Recherche et filtres
 
-Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent.
-
-## Comptes Supabase et favoris
-
-Créez un projet Supabase, puis recopiez son **Project URL** et sa clé **publishable/anon** dans `data/supabase-config.js`. Cette clé est publique dans une application statique; n’utilisez jamais la clé `service_role` ou une clé secrète côté navigateur. Exécutez `supabase/schema.sql` dans l’éditeur SQL du projet pour créer la table des favoris et ses règles Row Level Security (RLS). Les politiques limitent chaque compte à ses propres favoris.
-
-Dans les paramètres d’authentification Supabase, activez la confirmation des e-mails et ajoutez l’URL du site GitHub Pages aux URL de redirection autorisées. La connexion, la création de compte, la déconnexion et les favoris nécessitent HTTPS et Internet. Supabase Auth gère les mots de passe; le site ne les enregistre pas. Les favoris sont synchronisés avec le compte après connexion. Ne désactivez pas RLS.
-
-La configuration Supabase est volontairement laissée vide jusqu’à ce que le projet soit créé. La clé publique anon/publishable est visible des visiteurs sur GitHub Pages et ne donne aucun droit privilégié lorsque RLS est correctement configuré; les favoris restent privés au compte authentifié. N’ajoutez jamais de clé `service_role`.
+Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent. Ils sont stockés uniquement dans le navigateur utilisé; ils ne sont ni synchronisés entre appareils ni associés à un compte.
 
 ## Graphiques et rapports PDF
 
