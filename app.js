@@ -272,7 +272,12 @@ async function initializeOutbreakSection() {
   loading.className = "news-status";
   loading.textContent = "Chargement des alertes officielles…";
   outbreakList.replaceChildren(loading);
-  await loadDataScript("data/health-data.js");
+  await Promise.all([
+    loadDataScript("data/health-data.js"),
+    loadDataScript("data/provinces-rdc.js"),
+    loadDataScript("data/daily-updates.js")
+  ]);
+  applyOfficialEpidemicRegions(window.RDC_DAILY_UPDATES.items);
   renderOutbreakSection();
   await initializeOutbreakAnalytics();
 }
@@ -281,6 +286,7 @@ const chartScriptUrl = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.u
 const pdfScriptUrl = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 const mapMarkerStatuses = [
   { key: "ongoing", label: "Transmission signalée", color: "#b4232f" },
+  { key: "alert", label: "Région mentionnée par une source officielle — à vérifier", color: "#d59b42" },
   { key: "controlled", label: "Foyer initial contrôlé", color: "#25815a" },
   { key: "community", label: "Action communautaire", color: "#3676a7" },
   { key: "provincial", label: "Contexte provincial", color: "#607989" },
@@ -311,7 +317,11 @@ async function initializeOutbreakAnalytics() {
 }
 
 function getOutbreakRecords() {
-  return Array.isArray(window.RDC_HEALTH_DATA) ? window.RDC_HEALTH_DATA : [];
+  const officialRecords = Array.isArray(window.RDC_HEALTH_DATA) ? window.RDC_HEALTH_DATA : [];
+  const automaticRecords = Array.isArray(window.RDC_AUTO_EPIDEMIC_REGIONS)
+    ? window.RDC_AUTO_EPIDEMIC_REGIONS
+    : [];
+  return [...officialRecords, ...automaticRecords];
 }
 
 function getAlertNotificationState() {
@@ -455,13 +465,21 @@ function getRecordsForChart() {
   firstMonth.setDate(1);
   firstMonth.setHours(0, 0, 0, 0);
   firstMonth.setMonth(firstMonth.getMonth() - monthCount + 1);
-  const records = (Array.isArray(window.RDC_CITY_HEALTH_DATA)
+  const cityRecords = Array.isArray(window.RDC_CITY_HEALTH_DATA)
     ? window.RDC_CITY_HEALTH_DATA
     : []).filter((record) => {
     if (!record.date) return false;
     const date = new Date(record.date);
     return !Number.isNaN(date.getTime()) && date >= firstMonth && date <= currentMonth;
   });
+  const automaticRecords = (Array.isArray(window.RDC_AUTO_EPIDEMIC_REGIONS)
+    ? window.RDC_AUTO_EPIDEMIC_REGIONS
+    : []).filter((record) => {
+    if (!record.date) return false;
+    const date = new Date(record.date);
+    return !Number.isNaN(date.getTime()) && date >= firstMonth && date <= currentMonth;
+  });
+  const records = [...cityRecords, ...automaticRecords];
   const provinces = [...new Set(records.map((record) => record.province))]
     .sort((a, b) => a.localeCompare(b, "fr"));
   return { records, provinces };
