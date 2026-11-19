@@ -44,7 +44,6 @@ const accountEmail = document.getElementById("account-email");
 const accountPassword = document.getElementById("account-password");
 const accountStatus = document.getElementById("account-status");
 const accountSignOut = document.getElementById("account-sign-out");
-const accountResetPassword = document.getElementById("account-reset-password");
 const emptyState = document.getElementById("empty-state");
 const settingsToggle = document.getElementById("settings-toggle");
 const settingsForm = document.getElementById("settings-form");
@@ -1330,30 +1329,6 @@ async function initializeSupabaseFeatures() {
         } finally {
           buttons.forEach((button) => { button.disabled = false; });
           accountPassword.value = "";
-        }
-      });
-
-      accountResetPassword.addEventListener("click", async () => {
-        const email = accountEmail.value.trim();
-        if (!email) {
-          setAccountStatus("Saisissez votre adresse e-mail avant de demander un lien de réinitialisation.", true);
-          accountEmail.focus();
-          return;
-        }
-        accountResetPassword.disabled = true;
-        try {
-          const redirectUrl = new URL(window.location.href);
-          redirectUrl.hash = "";
-          const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: redirectUrl.href
-          });
-          if (error) throw error;
-          setAccountStatus("Si cette adresse est associée à un compte, un lien de réinitialisation lui sera envoyé.");
-        } catch (error) {
-          console.error("Échec de la demande de réinitialisation du mot de passe.", error);
-          setAccountStatus(`La demande n’a pas pu être envoyée : ${error.message}`, true);
-        } finally {
-          accountResetPassword.disabled = false;
         }
       });
 

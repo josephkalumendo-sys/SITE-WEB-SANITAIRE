@@ -28,7 +28,7 @@ Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubri
 
 ## Comptes et favoris synchronisés
 
-L’application utilise Supabase Auth pour créer un compte par e-mail, se connecter, réinitialiser un mot de passe et se déconnecter. Supabase gère les mots de passe; ils ne sont pas enregistrés par le site. Les favoris d’un compte sont stockés dans Supabase et protégés par Row Level Security (RLS). Sans configuration Supabase, les favoris continuent de fonctionner localement dans le navigateur.
+L’application utilise Supabase Auth pour créer un compte par e-mail, se connecter et se déconnecter. Supabase gère les mots de passe; ils ne sont pas enregistrés par le site. Les favoris d’un compte sont stockés dans Supabase et protégés par Row Level Security (RLS). Sans configuration Supabase, les favoris continuent de fonctionner localement dans le navigateur.
 
 Pour activer les comptes :
 
