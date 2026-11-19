@@ -1,6 +1,96 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-19T04:59:40.7511262+00:00",
+  "updatedAt": "2026-11-19T14:33:51.6654265+00:00",
   "items": [
+    {
+      "title": "Centralia teachers vote to strike if no contract is in place by Nov. 30",
+      "titleFr": null,
+      "url": "https://www.chronline.com/stories/centralia-teachers-vote-to-strike-if-no-contract-is-in-place-by-nov-30,412059",
+      "publishedAt": "2026-11-19T02:33:00.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Chronline",
+      "category": "media"
+    },
+    {
+      "title": "Pakistan’s first women-led agricultural seed bank to be established",
+      "titleFr": null,
+      "url": "https://www.nation.com.pk/19-Nov-2026/pakistan-s-first-women-led-agricultural-seed-bank-established",
+      "publishedAt": "2026-11-19T02:32:00.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "The Nation",
+      "category": "media"
+    },
+    {
+      "title": "Greater awareness to protect children from cybercrime stressed",
+      "titleFr": null,
+      "url": "https://www.nation.com.pk/19-Nov-2026/greater-awareness-protect-children-cybercrime-stressed",
+      "publishedAt": "2026-11-19T02:32:00.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "The Nation",
+      "category": "media"
+    },
+    {
+      "title": "FAME’26 – Father Muller Annual Meet for Excellence in Research in Homoeopathy",
+      "titleFr": null,
+      "url": "https://pingara.com/english-news/fame26-father-muller-annual-meet-for-excellence-in-research-in-homoeopathy/",
+      "publishedAt": "2026-11-19T02:31:56.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Pingara",
+      "category": "media"
+    },
+    {
+      "title": "Nigeria Was On The Cliff Before Tinubu’s Emergence — Jumoke",
+      "titleFr": null,
+      "url": "https://independent.ng/nigeria-was-on-the-cliff-before-tinubus-emergence-jumoke/",
+      "publishedAt": "2026-11-19T02:31:43.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Independentng",
+      "category": "media"
+    },
+    {
+      "title": "10 Stocks Investors Are Rushing to Buy — Cybersecurity Names Dominate",
+      "titleFr": null,
+      "url": "https://www.insidermonkey.com/news/10-stocks-investors-are-rushing-to-buy-cybersecurity-names-dominate-1867261/",
+      "publishedAt": "2026-11-19T02:31:03.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Insider Trading",
+      "category": "media"
+    },
+    {
+      "title": "Scientists discover a hidden hereditary form of aggressive prostate cancer",
+      "titleFr": null,
+      "url": "https://www.sciencedaily.com/releases/2026/11/261117033911.htm",
+      "publishedAt": "2026-11-19T02:31:02.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Science Daily",
+      "category": "media"
+    },
+    {
+      "title": "EAM Dr S Jaishankar and Defence Minister Rajnath Singh to co-chair India-Japan 2+2 Dialogue in Tokyo",
+      "titleFr": null,
+      "url": "https://newsonair.gov.in/eam-dr-s-jaishankar-and-defence-minister-rajnath-singh-to-co-chair-india-japan-22-dialogue-in-tokyo/",
+      "publishedAt": "2026-11-19T02:30:48.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Newsonair",
+      "category": "media"
+    },
+    {
+      "title": "From Sanitation to Solar Power, What Should Your Village Prioritise? This IAS Officer’s 25-Point Manifesto Makes People Part of the Plan",
+      "titleFr": null,
+      "url": "https://thebetterindia.com/governance/village-manifesto-gram-pradhan-local-governance-12820689",
+      "publishedAt": "2026-11-19T02:30:38.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "Thebetterindia",
+      "category": "media"
+    },
+    {
+      "title": "No station, no loo: Caught in land row, LTT cops operate out of metal containers",
+      "titleFr": null,
+      "url": "https://indianexpress.com/article/cities/mumbai/lokmanya-tilak-terminus-railway-police-station-metal-containers-land-dispute-10968945/",
+      "publishedAt": "2026-11-19T02:30:22.0000000+00:00",
+      "source": "NewsData.io",
+      "publisher": "The Indian Express",
+      "category": "media"
+    },
     {
       "title": "Ebola Bundibugyo virus disease outbreak: Democratic Republic of the Congo | Kenya | Nigeria Weekly External Situation Report 27, Data as of 15 November 2026",
       "titleFr": null,
@@ -18,6 +108,42 @@ window.RDC_DAILY_UPDATES = {
       "source": "OMS Afrique",
       "publisher": "OMS Afrique",
       "category": "official"
+    },
+    {
+      "title": "3,000 recover from Ebola in DR Congo: WHO",
+      "titleFr": null,
+      "url": "https://www.nation.com.pk/16-Nov-2026/3-000-recover-ebola-dr-congo",
+      "publishedAt": "2026-11-16T04:03:28.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Nation",
+      "category": "media"
+    },
+    {
+      "title": "DR Congo Ebola Crisis Deepens: Violence Hinders Aid, Remote Areas Hit Hard",
+      "titleFr": null,
+      "url": "https://www.lokmattimes.com/international/dr-congo-ebola-crisis-deepens-violence-hinders-aid-remote-areas-hit-hard-a001-w02/",
+      "publishedAt": "2026-11-16T01:17:00.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Lokmat Times",
+      "category": "media"
+    },
+    {
+      "title": "Africa CDC says Ebola outbreak in DR Congo ‘still not under control’",
+      "titleFr": null,
+      "url": "https://www.aljazeera.com/news/2026/11/15/africa-cdc-says-ebola-outbreak-in-dr-congo-still-not-under-control",
+      "publishedAt": "2026-11-15T20:07:06.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Al Jazeera",
+      "category": "media"
+    },
+    {
+      "title": "DR Congo: Ebola-awareness campaigns conducted at schools in Bunia",
+      "titleFr": null,
+      "url": "https://www.africanews.com/2026/11/15/dr-congo-ebola-awareness-campaigns-conducted-at-schools-in-bunia/",
+      "publishedAt": "2026-11-14T22:03:58.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Africanews",
+      "category": "media"
     },
     {
       "title": "DR Congo: Multi-country Bundibugyo Ebola Virus Disease Outbreak Situation Report No. 26 (2 – 8 November 2026)",
@@ -56,6 +182,24 @@ window.RDC_DAILY_UPDATES = {
       "category": "humanitarian"
     },
     {
+      "title": "WHO Warns DR Congo Ebola Outbreak 'Concerning' Amid Rising Violence",
+      "titleFr": null,
+      "url": "https://www.lokmattimes.com/international/who-warns-dr-congo-ebola-outbreak-concerning-amid-rising-violence-a001-w02/",
+      "publishedAt": "2026-11-12T15:48:41.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Lokmat Times",
+      "category": "media"
+    },
+    {
+      "title": "WHO Warns DR Congo Ebola Outbreak Remains 'Concerning' Amidst Escalating Violence",
+      "titleFr": null,
+      "url": "https://www.lokmattimes.com/health/who-warns-dr-congo-ebola-outbreak-remains-concerning-amidst-escalating-violence-a001-w02/",
+      "publishedAt": "2026-11-12T15:48:41.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Lokmat Times",
+      "category": "media"
+    },
+    {
       "title": "DR Congo: MSF DRC Ebola: Persistent gaps between resources and action remain six months on",
       "titleFr": "Ebola en RDC : six mois après, des écarts persistants entre les ressources disponibles et l’action menée – MSF",
       "url": "https://reliefweb.int/report/democratic-republic-congo/msf-drc-ebola-persistent-gaps-between-resources-and-action-remain-six-months",
@@ -65,6 +209,24 @@ window.RDC_DAILY_UPDATES = {
       "category": "humanitarian"
     },
     {
+      "title": "MSF warns hundreds of millions missing from DRC Ebola funds",
+      "titleFr": null,
+      "url": "https://www.newsbytesapp.com/news/world/msf-warns-hundreds-of-millions-missing-from-drc-ebola-funds/tldr",
+      "publishedAt": "2026-11-12T13:07:51.0000000+00:00",
+      "source": "GNews",
+      "publisher": "NewsBytes",
+      "category": "media"
+    },
+    {
+      "title": "DR Congo Ebola outbreak surpasses 11,000 cases as conflict hampers response",
+      "titleFr": null,
+      "url": "https://www.africanews.com/2026/11/12/dr-congo-ebola-outbreak-surpasses-11000-cases-as-conflict-hampers-response/",
+      "publishedAt": "2026-11-12T06:12:48.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Africanews",
+      "category": "media"
+    },
+    {
       "title": "WHO Director-General's opening remarks at the Member State briefing on Ebola outbreak in the Democratic Republic of the Congo – 11 November 2026",
       "titleFr": "Allocution d’ouverture du Directeur général de l’OMS lors de la réunion d’information des États membres sur l’épidémie d’Ebola en République démocratique du Congo – 11 novembre 2026",
       "url": "https://reliefweb.int/report/democratic-republic-congo/who-director-generals-opening-remarks-member-state-briefing-ebola-outbreak-democratic-republic-congo-11-november-2026",
@@ -72,6 +234,24 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian"
+    },
+    {
+      "title": "DR Congo Ebola outbreak exceeds 11,000 cases, causes 5,387 deaths",
+      "titleFr": null,
+      "url": "https://www.thehindu.com/news/international/dr-congo-ebola-outbreak-exceeds-11000-cases-causes-5387-deaths/article71691022.ece",
+      "publishedAt": "2026-11-11T17:01:12.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Hindu",
+      "category": "media"
+    },
+    {
+      "title": "DR Congo's Deadliest Ebola Outbreak Hits 11,000 Cases, Deaths Cross 5,300",
+      "titleFr": null,
+      "url": "https://www.ndtv.com/health/dr-congos-deadliest-ebola-outbreak-hits-11-000-cases-deaths-cross-5-300-12311743",
+      "publishedAt": "2026-11-11T08:13:03.0000000+00:00",
+      "source": "GNews",
+      "publisher": "NDTV.com",
+      "category": "media"
     },
     {
       "title": "Ebola Bundibugyo virus disease outbreak: Democratic Republic of the Congo | Kenya | Nigeria Weekly External Situation Report 26, Data as of 7 November 2026",
@@ -123,13 +303,13 @@ window.RDC_DAILY_UPDATES = {
     },
     {
       "name": "GNews",
-      "state": "not_configured",
-      "message": "Ajoutez la clé d’API correspondante aux secrets GitHub pour activer ce flux."
+      "state": "updated",
+      "message": "10 publications récentes trouvées."
     },
     {
       "name": "NewsData.io",
-      "state": "not_configured",
-      "message": "Ajoutez la clé d’API correspondante aux secrets GitHub pour activer ce flux."
+      "state": "updated",
+      "message": "10 publications récentes trouvées."
     }
   ]
 };
