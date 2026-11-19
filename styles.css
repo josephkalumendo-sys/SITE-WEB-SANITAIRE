@@ -1808,6 +1808,11 @@ h1 span {
   margin-top: 13px;
 }
 
+.account-form[hidden],
+#account-sign-out[hidden] {
+  display: none;
+}
+
 .account-form > label {
   color: #52655c;
   font-size: 10px;
