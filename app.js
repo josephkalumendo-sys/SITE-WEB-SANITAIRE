@@ -749,9 +749,7 @@ document.addEventListener("keydown", (event) => {
 
 function getOfficialRecords(feature) {
   const name = getProvinceName(feature);
-  const records = Array.isArray(window.RDC_HEALTH_DATA)
-    ? window.RDC_HEALTH_DATA
-    : [];
+  const records = getOutbreakRecords();
   return records.filter((record) =>
     provinceNames[record.province] === name ||
     record.province === name ||
@@ -778,6 +776,27 @@ function applyOfficialMapStatus() {
       shape.setAttribute("fill", "#d59b42");
     } else {
       shape.removeAttribute("fill");
+    }
+
+    const healthLabel = [...map.querySelectorAll(".health-label")]
+      .find((label) => label.dataset.featureId === shape.dataset.featureId);
+    const labelText = officialDiseaseLabel(feature);
+    if (labelText) {
+      const label = healthLabel || document.createElementNS("http://www.w3.org/2000/svg", "text");
+      if (!healthLabel) {
+        const bounds = shape.getBBox();
+        label.setAttribute("class", "health-label");
+        label.setAttribute("x", (bounds.x + bounds.width / 2).toFixed(2));
+        label.setAttribute("y", (bounds.y + bounds.height / 2 + 13).toFixed(2));
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("aria-hidden", "true");
+        label.setAttribute("pointer-events", "none");
+        label.dataset.featureId = shape.dataset.featureId;
+        map.appendChild(label);
+      }
+      label.textContent = labelText;
+    } else if (healthLabel) {
+      healthLabel.remove();
     }
   });
 }
@@ -881,11 +900,9 @@ function formatPublicationDate(value) {
 
 function renderOutbreakSection() {
   refreshAlertNotifications();
-  const records = Array.isArray(window.RDC_HEALTH_DATA)
-    ? window.RDC_HEALTH_DATA.filter((record) =>
-      record.status === "confirmed" || record.status === "alert" || record.status === "historical"
-    )
-    : [];
+  const records = getOutbreakRecords().filter((record) =>
+    record.status === "confirmed" || record.status === "alert" || record.status === "historical"
+  );
   outbreakList.replaceChildren();
 
   if (!records.length) {
@@ -1186,6 +1203,8 @@ function renderDailyUpdates() {
     typeof item.url === "string" && item.url.startsWith("https://") &&
     isEpidemicPublication(item)
   );
+  applyOfficialEpidemicRegions(updates.items);
+  renderOutbreakSection();
   updateDailyNewsSources(dailyNewsItems);
   renderDailyNewsItems();
 }
