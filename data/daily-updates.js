@@ -1,14 +1,23 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-18T04:57:00.7152580+00:00",
+  "updatedAt": "2026-11-19T04:59:40.7511262+00:00",
   "items": [
     {
-      "title": "DR Congo: Six months on, accessing hard-to-reach communities key to halting Ebola outbreak",
-      "titleFr": "RDC : six mois après, il est essentiel d’atteindre les communautés difficiles d’accès pour contenir l’épidémie d’Ebola",
-      "url": "https://reliefweb.int/report/democratic-republic-congo/six-months-accessing-hard-reach-communities-key-halting-ebola-outbreak-0",
-      "publishedAt": "2026-11-16T05:30:37.0000000+00:00",
+      "title": "Ebola Bundibugyo virus disease outbreak: Democratic Republic of the Congo | Kenya | Nigeria Weekly External Situation Report 27, Data as of 15 November 2026",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/democratic-republic-congo/ebola-bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation-report-27-data-15-november-2026",
+      "publishedAt": "2026-11-18T18:33:06.0000000+00:00",
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian"
+    },
+    {
+      "title": "EBOLA BUNDIBUGYO VIRUS DISEASE OUTBREAK Democratic Republic of the Congo | Uganda Weekly External Situation Report 27, Data as of 15 November 2026",
+      "titleFr": null,
+      "url": "https://www.afro.who.int/countries/kenya/publication/ebola-bundibugyo-virus-disease-outbreak-democratic-republic-congo-uganda-weekly-external-situation",
+      "publishedAt": "2026-11-18T17:31:05.0000000+00:00",
+      "source": "OMS Afrique",
+      "publisher": "OMS Afrique",
+      "category": "official"
     },
     {
       "title": "DR Congo: Multi-country Bundibugyo Ebola Virus Disease Outbreak Situation Report No. 26 (2 – 8 November 2026)",
@@ -65,16 +74,16 @@ window.RDC_DAILY_UPDATES = {
       "category": "humanitarian"
     },
     {
-      "title": "Ebola Bundibugyo virus disease outbreak: Democratic Republic of the Congo | Kenya | Nigeria Weekly External Situation Report 25, Data as of 7 November 2026",
-      "titleFr": "Épidémie de maladie à virus Bundibugyo : rapport de situation hebdomadaire externe n° 25 pour la RDC, le Kenya et le Nigéria, données au 7 novembre 2026",
-      "url": "https://reliefweb.int/report/democratic-republic-congo/ebola-bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation-report-25-data-7-november-2026",
+      "title": "Ebola Bundibugyo virus disease outbreak: Democratic Republic of the Congo | Kenya | Nigeria Weekly External Situation Report 26, Data as of 7 November 2026",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/democratic-republic-congo/ebola-bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation-report-26-data-7-november-2026",
       "publishedAt": "2026-11-10T21:03:06.0000000+00:00",
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian"
     },
     {
-      "title": "BUNDIBUGYO VIRUS DISEASE OUTBREAK Democratic Republic of the Congo | Kenya | Nigeria - Weekly External Situation Report 25, Data as of 7 November 2026",
+      "title": "BUNDIBUGYO VIRUS DISEASE OUTBREAK Democratic Republic of the Congo | Kenya | Nigeria - Weekly External Situation Report 26, Data as of 7 November 2026",
       "titleFr": "Épidémie de maladie à virus Bundibugyo : rapport de situation hebdomadaire externe n° 25 pour la RDC, le Kenya et le Nigéria, données au 7 novembre 2026",
       "url": "https://www.afro.who.int/countries/kenya/publication/bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation",
       "publishedAt": "2026-11-10T20:10:51.0000000+00:00",
@@ -99,24 +108,6 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian"
-    },
-    {
-      "title": "DR Congo: UNICEF Humanitarian Situation Report No. 3 (BVD Outbreak in DRC: Regional Preparedness and Readiness in Neighboring and At-Risk Countries), Aug-Sept 2026",
-      "titleFr": "RDC : rapport de situation humanitaire n° 3 de l’UNICEF sur l’épidémie de maladie à virus Bundibugyo, la préparation régionale et les pays voisins à risque (août-septembre 2026)",
-      "url": "https://reliefweb.int/report/democratic-republic-congo/unicef-humanitarian-situation-report-no-3-bvd-outbreak-drc-regional-preparedness-and-readiness-neighboring-and-risk-countries-aug-sept-2026",
-      "publishedAt": "2026-11-09T03:52:16.0000000+00:00",
-      "source": "ReliefWeb",
-      "publisher": "ReliefWeb",
-      "category": "humanitarian"
-    },
-    {
-      "title": "BUNDIBUGYO VIRUS DISEASE OUTBREAK Democratic Republic of the Congo | Kenya | Nigeria - Weekly External Situation Report 24, Data as of 1 November 2026",
-      "titleFr": "Épidémie de maladie à virus Bundibugyo : rapport de situation hebdomadaire externe n° 24 pour la RDC, le Kenya et le Nigéria, données au 1er novembre 2026",
-      "url": "https://www.afro.who.int/countries/nigeria/publication/bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation",
-      "publishedAt": "2026-11-06T19:48:33.0000000+00:00",
-      "source": "OMS Afrique",
-      "publisher": "OMS Afrique",
-      "category": "official"
     }
   ],
   "sources": [
@@ -128,7 +119,7 @@ window.RDC_DAILY_UPDATES = {
     {
       "name": "ReliefWeb",
       "state": "updated",
-      "message": "11 publications récentes trouvées."
+      "message": "10 publications récentes trouvées."
     },
     {
       "name": "GNews",
