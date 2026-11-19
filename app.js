@@ -1518,14 +1518,11 @@ async function toggleFavorite(item) {
   renderDailyNewsItems();
 
   try {
-    const { error } = isFavorite
+    const request = isFavorite
       ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
       : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite));
+    const { error } = await request;
     if (error) throw error;
-    const result = await (isFavorite
-      ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
-      : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite)));
-    if (result.error) throw result.error;
     if (accountUser && accountUser.id === userId) {
       setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
     }
