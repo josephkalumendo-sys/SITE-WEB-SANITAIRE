@@ -28,7 +28,7 @@ Dans **Actualités sanitaires**, seules les publications liées à une épidémi
 
 ## Comptes et favoris synchronisés
 
-Le formulaire de compte est accessible dans **Actualités sanitaires**, près des filtres de favoris. L’application utilise Supabase Auth pour créer un compte par e-mail, se connecter et se déconnecter. Supabase gère les mots de passe; ils ne sont pas enregistrés par le site. Les favoris d’un compte sont stockés dans Supabase et protégés par Row Level Security (RLS). Sans configuration Supabase, le formulaire reste désactivé et les favoris continuent de fonctionner localement dans le navigateur.
+Le formulaire de compte est accessible dans **Actualités sanitaires**, près des filtres de favoris. L’application utilise Supabase Auth pour créer un compte par e-mail, se connecter et se déconnecter. Supabase gère les mots de passe; ils ne sont pas enregistrés par le site. Les favoris d’un compte sont stockés dans Supabase et protégés par Row Level Security (RLS). Il faut être connecté pour ajouter ou afficher ses favoris; cliquer sur un favori ou sur le filtre sans session ramène au formulaire du compte.
 
 Pour activer les comptes :
 

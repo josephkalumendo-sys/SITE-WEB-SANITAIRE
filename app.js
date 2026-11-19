@@ -39,6 +39,7 @@ const dailyNewsTo = document.getElementById("daily-news-to");
 const dailyNewsFavoritesOnly = document.getElementById("daily-news-favorites");
 const dailyNewsFilterCount = document.getElementById("daily-news-filter-count");
 const favoriteStorageStatus = document.getElementById("favorite-storage-status");
+const accountPanel = document.querySelector(".account-panel");
 const accountForm = document.getElementById("account-form");
 const accountEmail = document.getElementById("account-email");
 const accountPassword = document.getElementById("account-password");
@@ -1126,8 +1127,17 @@ function renderDailyUpdates() {
   renderDailyNewsItems();
 }
 
-dailyNewsFilters.addEventListener("input", renderDailyNewsItems);
-dailyNewsFilters.addEventListener("change", renderDailyNewsItems);
+function handleDailyNewsFilter(event) {
+  if (dailyNewsFavoritesOnly.checked && !accountUser) {
+    dailyNewsFavoritesOnly.checked = false;
+    focusAccountForFavorites();
+    return;
+  }
+  renderDailyNewsItems();
+}
+
+dailyNewsFilters.addEventListener("input", handleDailyNewsFilter);
+dailyNewsFilters.addEventListener("change", handleDailyNewsFilter);
 dailyNewsFilters.addEventListener("reset", () => {
   window.setTimeout(renderDailyNewsItems, 0);
 });
@@ -1140,6 +1150,12 @@ function setFavoriteStorageStatus(message, isError = false) {
 function setAccountStatus(message, isError = false) {
   accountStatus.textContent = message;
   accountStatus.classList.toggle("is-error", isError);
+}
+
+function focusAccountForFavorites() {
+  setAccountStatus("Connectez-vous ou créez un compte pour enregistrer et consulter vos favoris.");
+  accountPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+  accountEmail.focus({ preventScroll: true });
 }
 
 function loadLocalFavorites() {
@@ -1172,20 +1188,6 @@ function initializeAccountFeatures() {
     localFavoritesLoaded = true;
   }
   initializeSupabaseFeatures();
-}
-
-function saveLocalFavorites(nextFavorites) {
-  try {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...nextFavorites.values()]));
-    localFavoriteArticles = nextFavorites;
-    favoriteArticles = new Map(localFavoriteArticles);
-    setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans ce navigateur.`);
-    return true;
-  } catch (error) {
-    console.error("Impossible d’enregistrer les favoris locaux.", error);
-    setFavoriteStorageStatus("Le navigateur n’a pas pu enregistrer les favoris.", true);
-    return false;
-  }
 }
 
 function loadSupabaseSdk() {
@@ -1391,6 +1393,17 @@ async function initializeSupabaseFeatures() {
 }
 
 async function toggleFavorite(item) {
+  if (!accountUser) {
+    focusAccountForFavorites();
+    return;
+  }
+
+  if (!supabaseClient) {
+    setFavoriteStorageStatus("Le service de compte n’est pas disponible; le favori n’a pas été enregistré.", true);
+    focusAccountForFavorites();
+    return;
+  }
+
   const nextFavorites = new Map(favoriteArticles);
   const isFavorite = nextFavorites.has(item.url);
   const favorite = {
@@ -1402,33 +1415,21 @@ async function toggleFavorite(item) {
     publishedAt: item.publishedAt || ""
   };
 
-  if (accountUser && supabaseClient) {
-    try {
-      const request = isFavorite
-        ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
-        : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite));
-      const { error } = await request;
-      if (error) throw error;
-      if (isFavorite) nextFavorites.delete(item.url);
-      else nextFavorites.set(item.url, favorite);
-      favoriteArticles = nextFavorites;
-      setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
-      renderDailyNewsItems();
-    } catch (error) {
-      console.error("Impossible de modifier ce favori dans Supabase.", error);
-      setFavoriteStorageStatus(`Le favori n’a pas pu être synchronisé : ${error.message}`, true);
-    }
-    return;
+  try {
+    const request = isFavorite
+      ? supabaseClient.from("favorites").delete().eq("article_url", item.url)
+      : supabaseClient.from("favorites").insert(toSupabaseFavorite(favorite));
+    const { error } = await request;
+    if (error) throw error;
+    if (isFavorite) nextFavorites.delete(item.url);
+    else nextFavorites.set(item.url, favorite);
+    favoriteArticles = nextFavorites;
+    setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
+    renderDailyNewsItems();
+  } catch (error) {
+    console.error("Impossible de modifier ce favori dans Supabase.", error);
+    setFavoriteStorageStatus(`Le favori n’a pas pu être synchronisé : ${error.message}`, true);
   }
-
-  if (isFavorite) {
-    nextFavorites.delete(item.url);
-  } else {
-    nextFavorites.set(item.url, favorite);
-  }
-
-  if (!saveLocalFavorites(nextFavorites)) return;
-  renderDailyNewsItems();
 }
 
 function loadDailyUpdates() {
