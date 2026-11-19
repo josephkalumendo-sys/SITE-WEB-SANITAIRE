@@ -1107,195 +1107,63 @@ dailyNewsFilters.addEventListener("reset", () => {
   window.setTimeout(renderDailyNewsItems, 0);
 });
 
-function setAccountStatus(message, isError = false) {
-  accountStatus.textContent = message;
-  accountStatus.classList.toggle("is-error", isError);
+function setFavoriteStorageStatus(message, isError = false) {
+  favoriteStorageStatus.textContent = message;
+  favoriteStorageStatus.classList.toggle("is-error", isError);
 }
 
-function updateAccountControls() {
-  const isSignedIn = Boolean(accountUser);
-  accountForm.hidden = !supabaseClient || isSignedIn;
-  accountSignOut.hidden = !isSignedIn;
-  renderDailyNewsItems();
-}
+function loadLocalFavorites() {
+  try {
+    const storedFavorites = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    const parsedFavorites = storedFavorites ? JSON.parse(storedFavorites) : [];
+    if (!Array.isArray(parsedFavorites)) {
+      throw new Error("Les favoris enregistrés n’ont pas le format attendu.");
+    }
 
-async function loadAccountFavorites() {
-  if (!supabaseClient || !accountUser) {
+    favoriteArticles = new Map(parsedFavorites
+      .filter((item) =>
+        item && typeof item.url === "string" && item.url.startsWith("https://") &&
+        typeof item.title === "string" && item.title.trim()
+      )
+      .map((item) => [item.url, item]));
+    setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans ce navigateur.`);
+  } catch (error) {
+    console.error("Impossible de charger les favoris locaux.", error);
     favoriteArticles = new Map();
-    return;
+    setFavoriteStorageStatus("Les favoris locaux ne sont pas accessibles dans ce navigateur.", true);
   }
-  const { data, error } = await supabaseClient
-    .from("favorites")
-    .select("article_url, article_title, source, publisher, category, published_at");
-  if (error) throw error;
-  favoriteArticles = new Map(data.map((favorite) => [favorite.article_url, {
-    url: favorite.article_url,
-    title: favorite.article_title || favorite.article_url,
-    source: favorite.source,
-    publisher: favorite.publisher,
-    category: favorite.category,
-    publishedAt: favorite.published_at
-  }]));
 }
 
-async function applyAccountSession(session) {
-  accountUser = session?.user || null;
-  favoriteArticles = new Map();
-  updateAccountControls();
-  if (!accountUser) {
-    setAccountStatus("Connectez-vous ou créez un compte pour synchroniser vos favoris.");
-    return;
-  }
-
-  setAccountStatus(`Connecté : ${accountUser.email || "compte utilisateur"} · Chargement des favoris…`);
+function saveLocalFavorites(nextFavorites) {
   try {
-    await loadAccountFavorites();
-    setAccountStatus(`Connecté : ${accountUser.email || "compte utilisateur"} · ${favoriteArticles.size} favori(s).`);
-    renderDailyNewsItems();
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...nextFavorites.values()]));
+    favoriteArticles = nextFavorites;
+    setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans ce navigateur.`);
+    return true;
   } catch (error) {
-    console.error("Impossible de charger les favoris Supabase.", error);
-    setAccountStatus("Compte connecté, mais favoris indisponibles. Vérifiez la table et les règles RLS Supabase.", true);
+    console.error("Impossible d’enregistrer les favoris locaux.", error);
+    setFavoriteStorageStatus("Le navigateur n’a pas pu enregistrer les favoris.", true);
+    return false;
   }
 }
 
-async function initializeSupabaseFeatures() {
-  const configuration = window.RDC_SUPABASE_CONFIG;
-  const url = typeof configuration?.url === "string" ? configuration.url.trim() : "";
-  const anonKey = typeof configuration?.anonKey === "string" ? configuration.anonKey.trim() : "";
-  if (!url || !anonKey) {
-    setAccountStatus("Comptes non configurés : renseignez l’URL Supabase et la clé anon publique dans data/supabase-config.js.");
-    accountForm.hidden = true;
-    return;
-  }
-
-  try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.protocol !== "https:" &&
-      !["localhost", "127.0.0.1"].includes(parsedUrl.hostname)) {
-      throw new Error("L’URL Supabase doit utiliser HTTPS.");
-    }
-    await loadDataScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1/dist/umd/supabase.js");
-    if (typeof window.supabase?.createClient !== "function") {
-      throw new Error("La bibliothèque cliente Supabase n’est pas disponible.");
-    }
-
-    supabaseClient = window.supabase.createClient(url, anonKey);
-    const { data, error } = await supabaseClient.auth.getSession();
-    if (error) throw error;
-    await applyAccountSession(data.session);
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-      window.setTimeout(() => {
-        applyAccountSession(session).catch((error) => {
-          console.error("Impossible d’actualiser la session du compte.", error);
-          setAccountStatus("La session du compte n’a pas pu être actualisée.", true);
-        });
-      }, 0);
+function toggleFavorite(item) {
+  const nextFavorites = new Map(favoriteArticles);
+  if (nextFavorites.has(item.url)) {
+    nextFavorites.delete(item.url);
+  } else {
+    nextFavorites.set(item.url, {
+      url: item.url,
+      title: item.titleFr || item.title,
+      source: item.source || "",
+      publisher: item.publisher || "",
+      category: item.category || "",
+      publishedAt: item.publishedAt || ""
     });
-  } catch (error) {
-    console.error("Impossible d’initialiser les comptes Supabase.", error);
-    setAccountStatus("Supabase est indisponible ou mal configuré. Vérifiez l’URL, la clé publique et votre connexion.", true);
-  }
-}
-
-accountForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (!supabaseClient) {
-    setAccountStatus("Configurez d’abord Supabase dans data/supabase-config.js.", true);
-    return;
-  }
-  if (!accountForm.reportValidity()) return;
-
-  const formData = new FormData(accountForm);
-  const email = String(formData.get("email") || "").trim();
-  const password = String(formData.get("password") || "");
-  const action = event.submitter?.value;
-  const submitButtons = [...accountForm.querySelectorAll('button[type="submit"]')];
-  submitButtons.forEach((button) => { button.disabled = true; });
-  setAccountStatus(action === "sign-up" ? "Création du compte…" : "Connexion…");
-
-  try {
-    const response = action === "sign-up"
-      ? await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: location.origin === "null"
-            ? undefined
-            : `${location.origin}${location.pathname}#actualites`
-        }
-      })
-      : await supabaseClient.auth.signInWithPassword({ email, password });
-    if (response.error) throw response.error;
-    if (action === "sign-up" && !response.data.session) {
-      setAccountStatus("Compte créé. Vérifiez votre boîte e-mail pour confirmer l’adresse avant de vous connecter.");
-    } else {
-      await applyAccountSession(response.data.session);
-    }
-  } catch (error) {
-    console.error("Échec de l’authentification Supabase.", error);
-    setAccountStatus(error.message || "L’authentification a échoué. Vérifiez les informations et la configuration Supabase.", true);
-  } finally {
-    submitButtons.forEach((button) => { button.disabled = false; });
-  }
-});
-
-accountSignOut.addEventListener("click", async () => {
-  if (!supabaseClient) return;
-  accountSignOut.disabled = true;
-  try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
-    await applyAccountSession(null);
-  } catch (error) {
-    console.error("Échec de la déconnexion Supabase.", error);
-    setAccountStatus("La déconnexion n’a pas abouti. Réessayez.", true);
-  } finally {
-    accountSignOut.disabled = false;
-  }
-});
-
-async function toggleFavorite(item, button) {
-  if (!accountUser || !supabaseClient) {
-    setAccountStatus(supabaseClient
-      ? "Connectez-vous pour enregistrer et synchroniser vos favoris."
-      : "Configurez Supabase avant d’enregistrer des favoris.", true);
-    document.getElementById("account-title").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
   }
 
-  const wasFavorite = favoriteArticles.has(item.url);
-  button.disabled = true;
-  try {
-    const response = wasFavorite
-      ? await supabaseClient.from("favorites")
-        .delete()
-        .eq("user_id", accountUser.id)
-        .eq("article_url", item.url)
-      : await supabaseClient.from("favorites")
-        .insert({
-          user_id: accountUser.id,
-          article_url: item.url,
-          article_title: item.titleFr || item.title,
-          source: item.source || null,
-          publisher: item.publisher || null,
-          category: item.category || null,
-          published_at: item.publishedAt || null
-        });
-    if (response.error) throw response.error;
-    if (wasFavorite) favoriteArticles.delete(item.url);
-    else favoriteArticles.set(item.url, {
-      ...item,
-      title: item.titleFr || item.title
-    });
-    updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
-    setAccountStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans votre compte.`);
-    renderDailyNewsItems();
-  } catch (error) {
-    console.error("Impossible d’enregistrer le favori.", error);
-    setAccountStatus("Favori non enregistré. Vérifiez la table et les règles RLS Supabase.", true);
-  } finally {
-    button.disabled = false;
-  }
+  if (!saveLocalFavorites(nextFavorites)) return;
+  renderDailyNewsItems();
 }
 
 function loadDailyUpdates() {
