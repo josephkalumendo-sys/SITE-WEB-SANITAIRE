@@ -73,6 +73,28 @@
         <p><strong>À retenir</strong> — Une publication médiatique n’est pas une confirmation officielle d’épidémie. Seules les autorités sanitaires compétentes peuvent confirmer une situation épidémique.</p>
       </section>
 
+      <section class="account-panel" aria-labelledby="account-title">
+        <div class="account-heading">
+          <div>
+            <p class="eyebrow">Favoris synchronisés</p>
+            <h3 id="account-title">Compte utilisateur</h3>
+          </div>
+          <p id="account-status" role="status" aria-live="polite">Vérification de la configuration du compte…</p>
+        </div>
+        <form class="account-form" id="account-form">
+          <label for="account-email">Adresse e-mail</label>
+          <input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          <label for="account-password">Mot de passe</label>
+          <input id="account-password" name="password" type="password" autocomplete="current-password" minlength="8" required>
+          <div class="account-actions">
+            <button type="submit" data-auth-action="sign-in">Se connecter</button>
+            <button type="submit" data-auth-action="sign-up">Créer un compte</button>
+          </div>
+        </form>
+        <button type="button" id="account-sign-out" hidden>Se déconnecter</button>
+        <p class="account-privacy">Supabase Auth gère les mots de passe; le site ne les stocke pas. Vos favoris sont privés au compte connecté et synchronisés entre appareils. N’enregistrez aucune donnée de patient.</p>
+      </section>
+
       <section class="section-dashboard" aria-labelledby="section-dashboard-title">
         <div class="section-dashboard-heading">
           <div>
@@ -233,27 +255,6 @@
         </aside>
       </section>
       <section class="daily-news" aria-labelledby="daily-news-title">
-        <section class="account-panel" aria-labelledby="account-title">
-          <div class="account-heading">
-            <div>
-              <p class="eyebrow">Favoris synchronisés</p>
-              <h3 id="account-title">Compte utilisateur</h3>
-            </div>
-            <p id="account-status" role="status" aria-live="polite">Vérification de la configuration du compte…</p>
-          </div>
-          <form class="account-form" id="account-form">
-            <label for="account-email">Adresse e-mail</label>
-            <input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required>
-            <label for="account-password">Mot de passe</label>
-            <input id="account-password" name="password" type="password" autocomplete="current-password" minlength="8" required>
-            <div class="account-actions">
-              <button type="submit" data-auth-action="sign-in">Se connecter</button>
-              <button type="submit" data-auth-action="sign-up">Créer un compte</button>
-            </div>
-          </form>
-          <button type="button" id="account-sign-out" hidden>Se déconnecter</button>
-          <p class="account-privacy">Supabase Auth gère les mots de passe; le site ne les stocke pas. Vos favoris sont privés au compte connecté et synchronisés entre appareils. N’enregistrez aucune donnée de patient.</p>
-        </section>
         <div class="daily-news-heading">
           <div>
             <p class="eyebrow">Veille actualisée automatiquement</p>
