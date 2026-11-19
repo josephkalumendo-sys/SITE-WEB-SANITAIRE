@@ -1196,7 +1196,10 @@ function loadSupabaseSdk() {
 }
 
 function updateAccountControls() {
-  accountForm.hidden = !supabaseClient || Boolean(accountUser);
+  accountForm.hidden = Boolean(accountUser);
+  accountForm.querySelectorAll("input, button").forEach((control) => {
+    control.disabled = !supabaseClient;
+  });
   accountSignOut.hidden = !accountUser;
   accountPassword.autocomplete = accountUser ? "new-password" : "current-password";
 }
@@ -1282,7 +1285,7 @@ async function initializeSupabaseFeatures() {
   supabaseInitialization = (async () => {
     const configuration = window.RDC_SUPABASE_CONFIG;
     if (!configuration || !configuration.url || !configuration.anonKey) {
-      accountForm.hidden = true;
+      updateAccountControls();
       setAccountStatus("Comptes non configurés. Ajoutez l’URL du projet et sa clé publique dans data/supabase-config.js, puis appliquez supabase/schema.sql.");
       return;
     }
@@ -1367,7 +1370,7 @@ async function initializeSupabaseFeatures() {
     } catch (error) {
       console.error("Impossible d’initialiser Supabase.", error);
       supabaseClient = null;
-      accountForm.hidden = true;
+      updateAccountControls();
       setAccountStatus(`Le service de compte n’est pas disponible : ${error.message}`, true);
     }
   })();
