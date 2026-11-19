@@ -991,6 +991,51 @@ function isEpidemicPublication(item) {
   return epidemicPublicationPattern.test(searchableText);
 }
 
+function applyOfficialEpidemicRegions(items) {
+  const knownProvinces = new Set((window.RDC_PROVINCES?.features || []).map(getProvinceName));
+  const alreadyActive = new Set((window.RDC_HEALTH_DATA || [])
+    .filter((record) => record.status === "confirmed" || record.status === "alert")
+    .map((record) => provinceNames[record.province] || record.province));
+  const latestByProvince = new Map();
+
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    if (
+      !item || item.category !== "official" ||
+      !isEpidemicPublication(item) ||
+      !Array.isArray(item.provinces) ||
+      typeof item.url !== "string" || !item.url.startsWith("https://")
+    ) return;
+
+    const publishedAt = new Date(item.publishedAt);
+    if (Number.isNaN(publishedAt.getTime())) return;
+    const date = publishedAt.toISOString().slice(0, 10);
+
+    item.provinces.forEach((reportedProvince) => {
+      if (typeof reportedProvince !== "string") return;
+      const province = provinceNames[reportedProvince] || reportedProvince;
+      if (!knownProvinces.has(province) || alreadyActive.has(province)) return;
+
+      const current = latestByProvince.get(province);
+      if (current && current.date >= date) return;
+      latestByProvince.set(province, {
+        province,
+        disease: "Signalement officiel d’épidémie — à vérifier",
+        mapLabel: "ALERTE À VÉRIFIER",
+        status: "alert",
+        source: item.source || "Source officielle",
+        date,
+        url: item.url,
+        provisional: true,
+        note: `La publication officielle « ${item.titleFr || item.title} » mentionne cette province dans un contexte épidémique. La localisation a été extraite automatiquement; ce repère nécessite une vérification et ne confirme pas à lui seul une transmission active dans toute la province.`
+      });
+    });
+  });
+
+  window.RDC_AUTO_EPIDEMIC_REGIONS = [...latestByProvince.values()];
+  if (map.querySelector(".province-shape")) applyOfficialMapStatus();
+  if (outbreakChart) renderOutbreakChart();
+}
+
 function updateDailyNewsSources(items) {
   const selectedSource = dailyNewsSource.value;
   const sources = [...new Set(items.map((item) => item.source).filter(Boolean))]
