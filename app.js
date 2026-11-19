@@ -63,6 +63,7 @@ let outbreakChart = null;
 let dailyNewsItems = [];
 let favoriteArticles = new Map();
 let localFavoriteArticles = new Map();
+let localFavoritesLoaded = false;
 const FAVORITES_STORAGE_KEY = "rdc-health-favorites";
 let supabaseClient = null;
 let accountUser = null;
@@ -262,8 +263,6 @@ async function initializeActualitesSection() {
     loadDataScript("data/city-health-data.js")
   ]);
   loadProvinces();
-  loadLocalFavorites();
-  initializeSupabaseFeatures();
   loadDailyUpdates();
 }
 
@@ -692,6 +691,9 @@ function showSection(sectionId, options = {}) {
   }
   window.scrollTo(0, 0);
   loadSectionData(sectionId);
+  if (sectionId === "accueil" || sectionId === "actualites") {
+    initializeAccountFeatures();
+  }
   return true;
 }
 
@@ -1149,6 +1151,14 @@ function loadLocalFavorites() {
     favoriteArticles = new Map();
     setFavoriteStorageStatus("Les favoris locaux ne sont pas accessibles dans ce navigateur.", true);
   }
+}
+
+function initializeAccountFeatures() {
+  if (!localFavoritesLoaded) {
+    loadLocalFavorites();
+    localFavoritesLoaded = true;
+  }
+  initializeSupabaseFeatures();
 }
 
 function saveLocalFavorites(nextFavorites) {
