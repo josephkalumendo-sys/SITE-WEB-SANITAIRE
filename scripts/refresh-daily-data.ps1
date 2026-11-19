@@ -130,6 +130,15 @@ function Add-NewsApiSource {
     $added = 0
     foreach ($record in $records) {
       $title = [string]$record.title
+      $searchText = @(
+        $title
+        [string]$record.description
+        [string]$record.content
+      ) -join " "
+      if ($searchText -notmatch $healthPattern -or $searchText -notmatch $drcPattern) {
+        continue
+      }
+
       $articleUrl = if ($SourceName -eq "GNews") { [string]$record.url } else { [string]$record.link }
       $dateText = if ($SourceName -eq "GNews") { [string]$record.publishedAt } else { [string]$record.pubDate }
       if (-not $title -or -not $articleUrl.StartsWith("https://", [StringComparison]::OrdinalIgnoreCase)) {
