@@ -1326,10 +1326,13 @@ function fromSupabaseFavorite(row) {
 }
 
 async function applyAccountSession(session) {
+  const previousUserId = accountUser ? accountUser.id : null;
   accountUser = session && session.user ? session.user : null;
+  const accountChanged = previousUserId !== (accountUser ? accountUser.id : null);
   updateAccountControls();
 
   if (!accountUser) {
+    dailyNewsFavoritesOnly.checked = false;
     favoriteArticles = new Map(localFavoriteArticles);
     setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) enregistré(s) dans ce navigateur.`);
     setAccountStatus(supabaseClient
@@ -1368,6 +1371,7 @@ async function applyAccountSession(session) {
       localFavoriteArticles.clear();
     }
     favoriteArticles = remoteFavorites;
+    if (accountChanged) dailyNewsFavoritesOnly.checked = true;
     setFavoriteStorageStatus(`${favoriteArticles.size} favori(s) synchronisé(s) avec votre compte.`);
     setAccountStatus(`Connecté${accountUser.email ? ` : ${accountUser.email}` : ""}. Vos favoris sont synchronisés.`);
   } catch (error) {
