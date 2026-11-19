@@ -1,10 +1,11 @@
-const CACHE_NAME = "veille-sanitaire-v2";
+const CACHE_NAME = "veille-sanitaire-v3";
 const DAILY_SYNC_TAG = "sync-daily-health-updates";
 const DAILY_UPDATES_URL = new URL("data/daily-updates.js", self.registration.scope);
 const APP_SHELL = [
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./data/supabase-config.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./data/city-health-data.js",

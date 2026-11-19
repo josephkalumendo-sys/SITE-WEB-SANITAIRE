@@ -24,7 +24,20 @@ Les publications automatiques affichent leur source et leur date. Elles n’actu
 
 ## Recherche et filtres
 
-Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent. Ils sont stockés uniquement dans le navigateur utilisé; ils ne sont ni synchronisés entre appareils ni associés à un compte.
+Dans **Actualités sanitaires**, le flux se filtre par mots-clés, source, rubrique/catégorie et intervalle de dates de publication. Les filtres sont combinables et peuvent être effacés en une fois. Les favoris conservent le titre, la source, la date et le lien afin de rester accessibles même lorsque la publication sort du flux récent.
+
+## Comptes et favoris synchronisés
+
+L’application utilise Supabase Auth pour créer un compte par e-mail, se connecter, réinitialiser un mot de passe et se déconnecter. Supabase gère les mots de passe; ils ne sont pas enregistrés par le site. Les favoris d’un compte sont stockés dans Supabase et protégés par Row Level Security (RLS). Sans configuration Supabase, les favoris continuent de fonctionner localement dans le navigateur.
+
+Pour activer les comptes :
+
+1. Créez un projet Supabase et activez le fournisseur **Email** dans **Authentication → Providers**. Configurez les URL autorisées et l’URL de redirection vers l’adresse HTTPS de GitHub Pages du site.
+2. Dans **SQL Editor**, exécutez [`supabase/schema.sql`](./supabase/schema.sql) pour créer la table et ses politiques RLS.
+3. Dans les paramètres API du projet, copiez l’URL du projet et sa clé `anon`/`publishable` publique dans [`data/supabase-config.js`](./data/supabase-config.js), aux champs `url` et `anonKey`. Cette clé publique est destinée au navigateur; n’y mettez jamais la clé `service_role` ou une clé secrète.
+4. Publiez le changement sur GitHub Pages, puis testez la création de compte, la confirmation par e-mail et la connexion.
+
+Les favoris locaux existants sont importés au premier chargement d’un compte. Les favoris synchronisés sont accessibles après connexion sur les autres appareils. Ne sauvegardez pas de données de patient dans l’application.
 
 ## Graphiques et rapports PDF
 
