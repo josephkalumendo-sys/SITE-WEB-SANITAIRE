@@ -1887,6 +1887,7 @@ function addProvince(feature, project) {
     healthLabel.setAttribute("text-anchor", "middle");
     healthLabel.setAttribute("aria-hidden", "true");
     healthLabel.setAttribute("pointer-events", "none");
+    healthLabel.dataset.featureId = featureId;
     healthLabel.textContent = diseaseLabel;
     map.appendChild(healthLabel);
   }
