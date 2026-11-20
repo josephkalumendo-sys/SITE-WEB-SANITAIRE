@@ -1271,6 +1271,8 @@ h1 span {
   place-items: center;
   min-height: 430px;
   overflow: hidden;
+  border-radius: 8px;
+  background: #e8f0f7;
 }
 
 #province-map {
