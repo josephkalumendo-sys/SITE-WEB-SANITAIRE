@@ -1221,7 +1221,7 @@ function updateDailyNewsSources(items) {
   const selectedSource = dailyNewsSource.value;
   const sources = [...new Set(items.map((item) => item.source).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, "fr"));
-  dailyNewsSource.replaceChildren(new Option("Toutes les sources", ""));
+  dailyNewsSource.replaceChildren(new Option("Toutes sources", ""));
   sources.forEach((source) => dailyNewsSource.add(new Option(source, source)));
   if (sources.includes(selectedSource)) {
     dailyNewsSource.value = selectedSource;

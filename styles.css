@@ -1487,6 +1487,11 @@ h1 span {
   background: #b83b3b;
 }
 
+.legend-no-alert {
+  margin-left: 4px;
+  background: #87ceeb;
+}
+
 .legend-city-active {
   margin-left: 4px;
   background: #b4232f;
