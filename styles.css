@@ -1718,6 +1718,15 @@ h1 span {
   font: 11px "Segoe UI", Arial, sans-serif;
 }
 
+.news-filters select {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.news-filters option {
+  white-space: normal;
+}
+
 .news-filters input:focus-visible,
 .news-filters select:focus-visible {
   border-color: #75a88b;
@@ -1918,7 +1927,7 @@ h1 span {
 
 .news-filters {
   display: grid;
-  grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(115px, 1fr));
+  grid-template-columns: minmax(170px, 2fr) repeat(6, minmax(92px, 1fr));
   align-items: end;
   gap: 10px;
   margin: 16px 0 8px;
@@ -1926,6 +1935,16 @@ h1 span {
   border: 1px solid #e8ede8;
   border-radius: 9px;
   background: #fbfcfb;
+}
+
+@media (max-width: 1100px) {
+  .news-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .news-filter-search {
+    grid-column: span 2;
+  }
 }
 
 .news-filters > label:not(.favorites-only-filter) {

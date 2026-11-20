@@ -74,6 +74,28 @@ function Get-MentionedProvinces {
   return $mentioned.ToArray()
 }
 
+function Get-ArticleLanguage {
+  param(
+    [Parameter(Mandatory = $true)][string]$Title,
+    [AllowEmptyString()][string]$ProvidedLanguage
+  )
+
+  if ($ProvidedLanguage -match "^(?i:fr|fra|fre|french|francais)$") { return "fr" }
+  if ($ProvidedLanguage -match "^(?i:en|eng|english)$") { return "en" }
+  $normalizedTitle = $Title.Normalize([Text.NormalizationForm]::FormD) -replace "\p{Mn}", ""
+  $normalizedTitle = $normalizedTitle.ToLowerInvariant()
+  if ($normalizedTitle -match "\b(epidemie|maladie|pour|dans|des|les|une|avec|sante|contre|selon)\b") { return "fr" }
+  if ($normalizedTitle -match "\b(outbreak|disease|health|cases|the|with|from|after|amid)\b") { return "en" }
+  return "unknown"
+}
+
+function Get-NormalizedTitle {
+  param([Parameter(Mandatory = $true)][string]$Title)
+
+  $normalizedTitle = $Title.Normalize([Text.NormalizationForm]::FormD) -replace "\p{Mn}", ""
+  return ($normalizedTitle.ToLowerInvariant() -replace "[^a-z0-9]+", " ").Trim()
+}
+
 function Add-RssSource {
   param(
     [Parameter(Mandatory = $true)][string]$Url,
@@ -127,6 +149,8 @@ function Add-RssSource {
         continue
       }
 
+      $mentionedProvinces = @(Get-MentionedProvinces -Text $searchText)
+      $rdcRelated = [bool](($title -match $drcPattern) -or ($articleUrl -match $drcPattern) -or ($mentionedProvinces.Count -gt 0))
       $articles.Add([pscustomobject]@{
         title = $title
         titleFr = if ($existingTitleTranslations.ContainsKey($articleUrl)) { $existingTitleTranslations[$articleUrl] } else { $null }
@@ -135,8 +159,10 @@ function Add-RssSource {
         source = $SourceName
         publisher = $SourceName
         category = $Category
+        language = Get-ArticleLanguage -Title $title -ProvidedLanguage ""
+        rdcRelated = $rdcRelated
         epidemicRelated = $true
-        provinces = @(Get-MentionedProvinces -Text $searchText)
+        provinces = $mentionedProvinces
       })
       $added++
     }
@@ -215,6 +241,8 @@ function Add-NewsApiSource {
       } else {
         [string]$record.source_name
       }
+      $mentionedProvinces = @(Get-MentionedProvinces -Text $searchText)
+      $rdcRelated = [bool](($title -match $drcPattern) -or ($articleUrl -match $drcPattern) -or ($mentionedProvinces.Count -gt 0))
       $articles.Add([pscustomobject]@{
         title = $title
         titleFr = if ($existingTitleTranslations.ContainsKey($articleUrl)) { $existingTitleTranslations[$articleUrl] } else { $null }
@@ -223,8 +251,14 @@ function Add-NewsApiSource {
         source = $SourceName
         publisher = $publisher
         category = $Category
+        language = if ($SourceName -eq "GNews") {
+          "en"
+        } else {
+          Get-ArticleLanguage -Title $title -ProvidedLanguage ([string]$record.language)
+        }
+        rdcRelated = $rdcRelated
         epidemicRelated = $true
-        provinces = @(Get-MentionedProvinces -Text $searchText)
+        provinces = $mentionedProvinces
       })
       $added++
     }
@@ -269,8 +303,44 @@ Add-NewsApiSource -SourceName "NewsData.io" -ApiKey $newsDataKey -Url $newsDataU
 
 $uniqueArticles = [System.Collections.Generic.List[object]]::new()
 $seenUrls = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$seenTitles = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 foreach ($article in @($articles | Sort-Object { [DateTimeOffset]::Parse($_.publishedAt) } -Descending)) {
-  if ($seenUrls.Add($article.url)) {
+  $normalizedTitle = Get-NormalizedTitle -Title ([string]$article.title)
+  $titleTokens = @($normalizedTitle -split "\s+" | Where-Object { $_.Length -gt 2 })
+  $publisher = ([string]$article.publisher).ToLowerInvariant()
+  $publishedDate = ([string]$article.publishedAt).Substring(0, 10)
+  $nearDuplicate = $false
+  if ($titleTokens.Count -ge 6) {
+    foreach ($existingArticle in $uniqueArticles) {
+      if (
+        $publisher -and
+        $publisher -eq ([string]$existingArticle.publisher).ToLowerInvariant() -and
+        $publishedDate -eq ([string]$existingArticle.publishedAt).Substring(0, 10)
+      ) {
+        $existingTitle = Get-NormalizedTitle -Title ([string]$existingArticle.title)
+        $existingTokens = @($existingTitle -split "\s+" | Where-Object { $_.Length -gt 2 })
+        if ($existingTokens.Count -lt 6) { continue }
+        $existingTokenSet = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($token in $existingTokens) { $existingTokenSet.Add($token) | Out-Null }
+        $sharedTokens = 0
+        foreach ($token in $titleTokens) {
+          if ($existingTokenSet.Contains($token)) { $sharedTokens++ }
+        }
+        if ((2.0 * $sharedTokens / ($titleTokens.Count + $existingTokens.Count)) -ge 0.7) {
+          $nearDuplicate = $true
+          break
+        }
+      }
+    }
+  }
+  $isDuplicateTitle = $normalizedTitle -and $seenTitles.Contains($normalizedTitle)
+  if (
+    -not $seenUrls.Contains($article.url) -and
+    -not $isDuplicateTitle -and
+    -not $nearDuplicate
+  ) {
+    $seenUrls.Add($article.url) | Out-Null
+    if ($normalizedTitle) { $seenTitles.Add($normalizedTitle) | Out-Null }
     $uniqueArticles.Add($article)
   }
 }

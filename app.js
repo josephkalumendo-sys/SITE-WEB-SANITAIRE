@@ -34,6 +34,8 @@ const dailyNewsFilters = document.getElementById("daily-news-filters");
 const dailyNewsSearch = document.getElementById("daily-news-search");
 const dailyNewsSource = document.getElementById("daily-news-source");
 const dailyNewsCategory = document.getElementById("daily-news-category");
+const dailyNewsGeography = document.getElementById("daily-news-geography");
+const dailyNewsLanguage = document.getElementById("daily-news-language");
 const dailyNewsFrom = document.getElementById("daily-news-from");
 const dailyNewsTo = document.getElementById("daily-news-to");
 const dailyNewsFavoritesOnly = document.getElementById("daily-news-favorites");
@@ -53,6 +55,8 @@ const commentStatus = document.getElementById("comment-status");
 const analyticsPeriod = document.getElementById("analytics-period");
 const analyticsSummary = document.getElementById("analytics-summary");
 const analyticsChartCanvas = document.getElementById("outbreak-chart");
+const publicationChartCanvas = document.getElementById("publication-chart");
+const publicationSummary = document.getElementById("publication-summary");
 const exportReportButton = document.getElementById("export-report");
 const exportReportStatus = document.getElementById("export-report-status");
 const alertNotificationsToggle = document.getElementById("alert-notifications-toggle");
@@ -61,6 +65,7 @@ const networkStatus = document.getElementById("network-status");
 const ALERT_NOTIFICATION_STORAGE_KEY = "rdc-health-alert-notifications";
 let selectedFeatureId = null;
 let outbreakChart = null;
+let publicationChart = null;
 let dailyNewsItems = [];
 let favoriteArticles = new Map();
 const pendingFavoriteUrls = new Set();
@@ -266,6 +271,7 @@ async function initializeActualitesSection() {
   ]);
   loadProvinces();
   loadDailyUpdates();
+  initializePublicationAnalytics();
 }
 
 async function initializeOutbreakSection() {
@@ -306,6 +312,7 @@ async function initializeOutbreakAnalytics() {
       throw new Error("Chart.js n’est pas disponible après le chargement du script.");
     }
     renderOutbreakChart();
+    renderPublicationChart();
   } catch (error) {
     console.error("Impossible de charger le graphique analytique.", error);
     analyticsSummary.textContent = "Le graphique n’a pas pu être chargé. Vérifiez votre connexion puis réessayez.";
@@ -314,6 +321,24 @@ async function initializeOutbreakAnalytics() {
     retry.textContent = "Réessayer le graphique";
     retry.addEventListener("click", initializeOutbreakAnalytics, { once: true });
     analyticsSummary.append(" ", retry);
+  }
+}
+
+async function initializePublicationAnalytics() {
+  try {
+    await loadDataScript(chartScriptUrl);
+    if (typeof window.Chart !== "function") {
+      throw new Error("Chart.js n’est pas disponible après le chargement du script.");
+    }
+    renderPublicationChart();
+  } catch (error) {
+    console.error("Impossible de charger le graphique des publications.", error);
+    publicationSummary.textContent = "Le graphique des publications n’a pas pu être chargé. Vérifiez votre connexion puis réessayez.";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Réessayer le graphique";
+    retry.addEventListener("click", initializePublicationAnalytics, { once: true });
+    publicationSummary.append(" ", retry);
   }
 }
 
@@ -540,6 +565,61 @@ function renderOutbreakChart() {
   analyticsSummary.textContent = records.length
     ? `${records.length} repères cartographiques · ${provinceTotals.join(" · ")}`
     : "Aucun repère daté dans la période sélectionnée. Cela ne signifie pas qu’aucun événement sanitaire n’a été signalé.";
+}
+
+function renderPublicationChart() {
+  const chartItems = dailyNewsItems.filter((item) =>
+    !dailyNewsGeography.value || isRdcPublication(item)
+  );
+  const categories = [...new Set(chartItems.map((item) => item.category).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "fr"));
+  const sources = [...new Set(chartItems.map((item) => item.source).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "fr"));
+  const datasets = categories.map((category, index) => {
+    const colors = ["#25815a", "#3676a7", "#d59b42"];
+    return {
+      label: dailyCategoryLabels[category] || "Autre rubrique",
+      data: sources.map((source) => chartItems.filter((item) =>
+        item.source === source && item.category === category
+      ).length),
+      backgroundColor: colors[index % colors.length],
+      borderRadius: 4
+    };
+  });
+
+  if (publicationChart) publicationChart.destroy();
+  publicationChart = new window.Chart(publicationChartCanvas, {
+    type: "bar",
+    data: { labels: sources, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: { usePointStyle: true, boxWidth: 8, padding: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.dataset.label} : ${context.parsed.y} publication(s)`
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          ticks: { precision: 0, stepSize: 1 },
+          title: { display: true, text: "Nombre de publications" }
+        }
+      }
+    }
+  });
+  const total = chartItems.length;
+  publicationSummary.textContent = total
+    ? `${total} publication${total === 1 ? "" : "s"} épidémique${total === 1 ? "" : "s"} chargée${total === 1 ? "" : "s"} dans ${sources.length} source${sources.length === 1 ? "" : "s"}.`
+    : "Aucune publication épidémique chargée pour le moment.";
 }
 
 analyticsPeriod.addEventListener("change", () => {
@@ -904,9 +984,15 @@ function renderOutbreakSection() {
   const records = getOutbreakRecords().filter((record) =>
     record.status === "confirmed" || record.status === "alert" || record.status === "historical"
   );
+  const groupedRecords = new Map();
+  records.forEach((record) => {
+    const key = `${record.url}|${record.status}`;
+    if (!groupedRecords.has(key)) groupedRecords.set(key, []);
+    groupedRecords.get(key).push(record);
+  });
   outbreakList.replaceChildren();
 
-  if (!records.length) {
+  if (!groupedRecords.size) {
     const empty = document.createElement("p");
     empty.className = "news-status";
     empty.textContent = "Aucune épidémie ou alerte officielle n’est chargée pour le moment.";
@@ -914,11 +1000,16 @@ function renderOutbreakSection() {
     return;
   }
 
-  records.forEach((record) => {
+  groupedRecords.forEach((group) => {
+    const record = group[0];
     const statusDetails = {
-      confirmed: { className: "is-confirmed", label: "Confirmation officielle" },
+      confirmed: { className: "is-confirmed", label: record.provisional
+        ? "Confirmation officielle · données provisoires"
+        : "Confirmation officielle" },
       alert: { className: "is-alert", label: "Alerte officielle" },
-      historical: { className: "is-historical", label: "Information historique" }
+      historical: { className: "is-historical", label: record.provisional
+        ? "Information historique · données provisoires"
+        : "Information historique" }
     }[record.status];
     const card = document.createElement("article");
     card.className = `outbreak-card ${statusDetails.className}`;
@@ -930,8 +1021,11 @@ function renderOutbreakSection() {
     const heading = document.createElement("h3");
     heading.textContent = record.disease;
 
+    const provinces = [...new Set(group.map((item) =>
+      provinceNames[item.province] || item.province
+    ))];
     const location = document.createElement("p");
-    location.textContent = `Zone : ${record.province}${record.provisional ? " · Données provisoires" : ""}`;
+    location.textContent = `${provinces.length > 1 ? "Zones" : "Zone"} : ${provinces.join(", ")}`;
 
     const link = document.createElement("a");
     link.href = record.url;
@@ -944,7 +1038,11 @@ function renderOutbreakSection() {
     meta.textContent = `Publication : ${formatPublicationDate(record.date)}`;
 
     card.append(status, heading, location, link, meta);
-    if (record.note) {
+    if (group.length > 1) {
+      const note = document.createElement("p");
+      note.textContent = "Les zones indiquées proviennent du même bulletin; consultez la source pour vérifier leur statut et leur période.";
+      card.appendChild(note);
+    } else if (record.note) {
       const note = document.createElement("p");
       note.textContent = record.note;
       card.appendChild(note);
@@ -999,6 +1097,70 @@ const dailyCategoryNotes = {
   media: "Information médiatique; elle ne constitue pas une confirmation officielle d’épidémie."
 };
 const epidemicPublicationPattern = /\b(?:outbreak\w*|epidem\w*|cluster\w* of (?:cases|infection\w*)|ebola|bundibugyo|cholera|mpox|monkey\s?pox|variole du singe|measles|rougeole|polio\w*|poliomyelite|meningit\w*|fievre jaune|yellow fever|peste|plague|dengue|chikungunya|marburg|rift valley fever|fievre hemorragique|viral hemorrhagic fever)\b/i;
+
+function normalizeNewsTitle(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function deduplicateNewsItems(items) {
+  const seenUrls = new Set();
+  const seenTitles = new Set();
+  const keptItems = [];
+  return items.filter((item) => {
+    const url = item.url.toLowerCase();
+    const title = normalizeNewsTitle(item.title);
+    const publisher = String(item.publisher || item.source || "").toLowerCase();
+    const date = String(item.publishedAt || "").slice(0, 10);
+    const tokens = title.split(" ").filter((token) => token.length > 2);
+    const nearDuplicate = tokens.length >= 6 && keptItems.some((previous) => {
+      if (
+        !date ||
+        String(previous.publisher || previous.source || "").toLowerCase() !== publisher ||
+        String(previous.publishedAt || "").slice(0, 10) !== date
+      ) return false;
+      const previousTokens = normalizeNewsTitle(previous.title).split(" ")
+        .filter((token) => token.length > 2);
+      if (previousTokens.length < 6) return false;
+      const previousTokenSet = new Set(previousTokens);
+      const sharedTokens = tokens.filter((token) => previousTokenSet.has(token)).length;
+      return 2 * sharedTokens / (tokens.length + previousTokens.length) >= 0.7;
+    });
+    if (seenUrls.has(url) || (title && seenTitles.has(title)) || nearDuplicate) return false;
+    seenUrls.add(url);
+    if (title) seenTitles.add(title);
+    keptItems.push(item);
+    return true;
+  });
+}
+
+function isRdcPublication(item) {
+  if (typeof item.rdcRelated === "boolean") return item.rdcRelated;
+  const text = normalizeNewsTitle([
+    item.title,
+    item.titleFr,
+    item.url,
+    ...(Array.isArray(item.provinces) ? item.provinces : [])
+  ].filter(Boolean).join(" "));
+  return /\b(?:drc|rdc|democratic republic of the congo|dr congo|congo kinshasa|bas uele|lower uele|equateur|haut katanga|upper katanga|haut lomami|upper lomami|haut uele|upper uele|ituri|kasai|kinshasa|kongo central|bas congo|lower congo|kwango|kwilu|lomami|lualaba|mai ndombe|maniema|mongala|north kivu|nord kivu|north ubangi|nord ubangi|sankuru|south kivu|sud kivu|south ubangi|sud ubangi|tanganyika|tshopo|tshuapa)\b/.test(text);
+}
+
+function getPublicationLanguages(item) {
+  const languages = new Set();
+  if (item.titleFr) languages.add("fr");
+  const value = String(item.language || "").trim().toLowerCase();
+  if (/^(fr|fra|fre|french|francais|français)\b/.test(value)) languages.add("fr");
+  else if (/^(en|eng|english|anglais)\b/.test(value)) languages.add("en");
+  const title = normalizeNewsTitle(item.title);
+  if (/\b(?:epidemie|maladie|pour|dans|des|les|une|avec|sante|contre|selon)\b/.test(title)) languages.add("fr");
+  else if (/\b(?:outbreak|disease|health|cases|the|with|from|after|amid)\b/.test(title)) languages.add("en");
+  if (!languages.size) languages.add("unknown");
+  return languages;
+}
 
 function isEpidemicPublication(item) {
   if (item.epidemicRelated === true) return true;
@@ -1075,6 +1237,8 @@ function getFilteredDailyNewsItems() {
     : dailyNewsItems;
   return sourceItems.filter((item) => {
     if (!isEpidemicPublication(item)) return false;
+    if (dailyNewsGeography.value === "rdc" && !isRdcPublication(item)) return false;
+    if (dailyNewsLanguage.value && !getPublicationLanguages(item).has(dailyNewsLanguage.value)) return false;
     const searchableText = [
       item.title,
       item.titleFr,
@@ -1099,6 +1263,7 @@ function getFilteredDailyNewsItems() {
 function renderDailyNewsItems() {
   const items = getFilteredDailyNewsItems();
   dailyNewsFeed.replaceChildren();
+  if (typeof window.Chart === "function") renderPublicationChart();
   updateDailyNewsSources([...dailyNewsItems, ...favoriteArticles.values()]);
   const sourceItems = dailyNewsFavoritesOnly.checked
     ? [...favoriteArticles.values()]
@@ -1130,7 +1295,9 @@ function renderDailyNewsItems() {
     link.href = item.url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = item.titleFr || item.title;
+    link.textContent = dailyNewsLanguage.value === "en"
+      ? item.title
+      : item.titleFr || item.title;
 
     const meta = document.createElement("p");
     meta.className = "daily-news-meta";
@@ -1204,11 +1371,11 @@ function renderDailyUpdates() {
       : "";
   dailySourceStatus.classList.toggle("is-warning", unavailable.length > 0);
 
-  dailyNewsItems = updates.items.filter((item) =>
+  dailyNewsItems = deduplicateNewsItems(updates.items.filter((item) =>
     item && typeof item.title === "string" &&
     typeof item.url === "string" && item.url.startsWith("https://") &&
     isEpidemicPublication(item)
-  );
+  ));
   applyOfficialEpidemicRegions(updates.items);
   renderOutbreakSection();
   updateDailyNewsSources(dailyNewsItems);

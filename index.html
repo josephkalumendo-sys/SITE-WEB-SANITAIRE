@@ -242,6 +242,19 @@
         </div>
         <p class="daily-news-note">Sources officielles, humanitaires et médiatiques. Les articles médiatiques et humanitaires ne confirment pas une épidémie; les couleurs et statuts de la carte ne changent qu’après vérification officielle.</p>
         <p class="daily-source-status" id="daily-source-status"></p>
+        <section class="analytics-panel publication-analytics" aria-labelledby="publication-analytics-title">
+          <div class="analytics-heading">
+            <div>
+              <p class="eyebrow">Indicateurs de veille</p>
+              <h3 id="publication-analytics-title">Publications par source et rubrique</h3>
+            </div>
+          </div>
+          <p class="analytics-note">Nombre de publications épidémiques actuellement chargées, réparties par source et type. Les flux sont actualisés périodiquement; un mois sans publication chargée ne signifie pas l’absence d’événement.</p>
+          <div class="analytics-chart-wrap">
+            <canvas id="publication-chart" role="img" aria-label="Nombre de publications épidémiques chargées par source et rubrique"></canvas>
+          </div>
+          <p class="analytics-summary" id="publication-summary" role="status" aria-live="polite"></p>
+        </section>
         <section class="account-panel" aria-labelledby="account-title">
           <div class="account-heading">
             <div>
@@ -277,7 +290,21 @@
               <option value="">Toutes les rubriques</option>
               <option value="official">Officielle</option>
               <option value="humanitarian">Humanitaire</option>
-              <option value="media">Médiatique · non confirmatoire</option>
+              <option value="media">Média · non confirmatoire</option>
+            </select>
+          </label>
+          <label for="daily-news-geography">Périmètre
+            <select id="daily-news-geography">
+              <option value="rdc">RDC uniquement</option>
+              <option value="">Tous les résultats collectés</option>
+            </select>
+          </label>
+          <label for="daily-news-language">Langue disponible
+            <select id="daily-news-language">
+              <option value="">Toutes les langues</option>
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+              <option value="unknown">Non précisée</option>
             </select>
           </label>
           <label for="daily-news-from">Du
