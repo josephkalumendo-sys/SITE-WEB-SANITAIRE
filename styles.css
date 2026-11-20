@@ -1294,18 +1294,18 @@ h1 span {
 
 .province-shape:hover,
 .province-shape:focus-visible {
-  fill: #a8cbb5;
+  fill: #c8dce8;
   outline: none;
 }
 
 .province-shape.is-selected {
-  fill: #4b9270;
+  fill: #337fa3;
   stroke: #fff;
   stroke-width: 1.8;
 }
 
 .province-shape:focus-visible {
-  filter: drop-shadow(0 0 3px #275d45);
+  filter: drop-shadow(0 0 3px #1d5e7b);
 }
 
 .province-label,
@@ -1411,8 +1411,8 @@ h1 span {
 
 .city-marker:focus-visible .city-marker-dot,
 .city-marker.is-selected .city-marker-dot {
-  stroke: #182820;
-  stroke-width: 2.5px;
+  stroke: #1d6f91;
+  stroke-width: 3.5px;
 }
 
 .city-status-ongoing {
@@ -1545,7 +1545,7 @@ h1 span {
 }
 
 #selected-legend {
-  color: var(--green);
+  color: #1d6484;
   font-weight: 600;
 }
 
@@ -1584,9 +1584,9 @@ h1 span {
 }
 
 .province-button.is-selected {
-  border-color: #6ea187;
-  background: #edf5ef;
-  color: var(--green-dark);
+  border-color: #4684a0;
+  background: #e5f1f7;
+  color: #1d5e7b;
   font-weight: 700;
 }
 
