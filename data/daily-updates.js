@@ -1,6 +1,19 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-20T04:56:37.6718003+00:00",
+  "updatedAt": "2026-11-21T04:52:37.2171603+00:00",
   "items": [
+    {
+      "title": "Ebola killed 46 members of one man’s family. Now he is fighting to save the rest",
+      "titleFr": null,
+      "url": "https://www.theguardian.com/global-development/2026/nov/20/ebola-virus-disease-epidemic-bundibugyo-strain-bunia-ituri-democratic-republic-congo",
+      "publishedAt": "2026-11-20T11:00:30.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Guardian",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": []
+    },
     {
       "title": "Central African Republic BVD Readiness - DREF Operational Update (MDRCF034), 18 November 2026",
       "titleFr": null,
@@ -9,6 +22,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -26,6 +41,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -40,6 +57,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "OMS Afrique",
       "publisher": "OMS Afrique",
       "category": "official",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -56,6 +75,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Haut-Uele"
@@ -69,6 +90,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Kasaï-Central",
@@ -88,6 +111,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "OMS Afrique",
       "publisher": "OMS Afrique",
       "category": "official",
+      "language": "en",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -99,6 +124,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -110,6 +137,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "The Nation",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -121,6 +150,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "Lokmat Times",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -132,6 +163,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "Al Jazeera",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -143,6 +176,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "Africanews",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -154,6 +189,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -168,6 +205,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -185,6 +224,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Haut-Lomami",
@@ -208,6 +249,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -222,21 +265,12 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "Lokmat Times",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Kinshasa"
       ]
-    },
-    {
-      "title": "WHO Warns DR Congo Ebola Outbreak 'Concerning' Amid Rising Violence",
-      "titleFr": null,
-      "url": "https://www.lokmattimes.com/international/who-warns-dr-congo-ebola-outbreak-concerning-amid-rising-violence-a001-w02/",
-      "publishedAt": "2026-11-12T15:48:41.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Lokmat Times",
-      "category": "media",
-      "epidemicRelated": true,
-      "provinces": []
     },
     {
       "title": "DR Congo: MSF DRC Ebola: Persistent gaps between resources and action remain six months on",
@@ -246,6 +280,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -260,6 +296,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "NewsBytes",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -271,6 +309,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "Africanews",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -282,6 +322,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Tshopo"
@@ -295,6 +337,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -317,6 +361,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Nord-Kivu"
@@ -330,6 +376,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "GNews",
       "publisher": "The Hindu",
       "category": "media",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -341,17 +389,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
-      "title": "DR Congo's Deadliest Ebola Outbreak Hits 11,000 Cases, Deaths Cross 5,300",
-      "titleFr": null,
-      "url": "https://www.ndtv.com/health/dr-congos-deadliest-ebola-outbreak-hits-11-000-cases-deaths-cross-5-300-12311743",
-      "publishedAt": "2026-11-11T08:13:03.0000000+00:00",
-      "source": "GNews",
-      "publisher": "NDTV.com",
-      "category": "media",
+      "language": "unknown",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -363,6 +402,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -381,6 +422,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "OMS Afrique",
       "publisher": "OMS Afrique",
       "category": "official",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -397,6 +440,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": [
         "Ituri",
@@ -411,6 +456,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -422,6 +469,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -433,6 +482,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
     },
@@ -444,6 +495,8 @@ window.RDC_DAILY_UPDATES = {
       "source": "ReliefWeb",
       "publisher": "ReliefWeb",
       "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     }
