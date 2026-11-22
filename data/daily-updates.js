@@ -1,6 +1,32 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-21T04:52:37.2171603+00:00",
+  "updatedAt": "2026-11-22T04:55:08.7667283+00:00",
   "items": [
+    {
+      "title": "Strain-specific Ebola jab trials to start in DR Congo next week: WHO",
+      "titleFr": null,
+      "url": "https://www.thehindu.com/sci-tech/health/strain-specific-ebola-jab-trials-to-start-in-dr-congo-next-week-who/article71728070.ece",
+      "publishedAt": "2026-11-21T11:28:34.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Hindu",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": []
+    },
+    {
+      "title": "Beating Ebola takes more than medicine - I saw what worked in west Africa a decade ago",
+      "titleFr": null,
+      "url": "https://www.theguardian.com/global-development/2026/nov/21/ebola-outbreak-congo-worst-ever",
+      "publishedAt": "2026-11-21T06:00:53.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Guardian",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": false,
+      "epidemicRelated": true,
+      "provinces": []
+    },
     {
       "title": "Ebola killed 46 members of one man’s family. Now he is fighting to save the rest",
       "titleFr": null,
@@ -302,19 +328,6 @@ window.RDC_DAILY_UPDATES = {
       "provinces": []
     },
     {
-      "title": "DR Congo Ebola outbreak surpasses 11,000 cases as conflict hampers response",
-      "titleFr": null,
-      "url": "https://www.africanews.com/2026/11/12/dr-congo-ebola-outbreak-surpasses-11000-cases-as-conflict-hampers-response/",
-      "publishedAt": "2026-11-12T06:12:48.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Africanews",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
       "title": "WHO Director-General's opening remarks at the Member State briefing on Ebola outbreak in the Democratic Republic of the Congo – 11 November 2026",
       "titleFr": "Allocution d’ouverture du Directeur général de l’OMS lors de la réunion d’information des États membres sur l’épidémie d’Ebola en République démocratique du Congo – 11 novembre 2026",
       "url": "https://reliefweb.int/report/democratic-republic-congo/who-director-generals-opening-remarks-member-state-briefing-ebola-outbreak-democratic-republic-congo-11-november-2026",
@@ -367,19 +380,6 @@ window.RDC_DAILY_UPDATES = {
       "provinces": [
         "Nord-Kivu"
       ]
-    },
-    {
-      "title": "DR Congo Ebola outbreak exceeds 11,000 cases, causes 5,387 deaths",
-      "titleFr": null,
-      "url": "https://www.thehindu.com/news/international/dr-congo-ebola-outbreak-exceeds-11000-cases-causes-5387-deaths/article71691022.ece",
-      "publishedAt": "2026-11-11T17:01:12.0000000+00:00",
-      "source": "GNews",
-      "publisher": "The Hindu",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
     },
     {
       "title": "Central African Republic: Situation Report No. 93, as of 10 November 2026",
