@@ -1,5 +1,5 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-22T04:55:08.7667283+00:00",
+  "updatedAt": "2026-11-23T05:14:17.1234811+00:00",
   "items": [
     {
       "title": "Strain-specific Ebola jab trials to start in DR Congo next week: WHO",
@@ -13,6 +13,27 @@ window.RDC_DAILY_UPDATES = {
       "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
+    },
+    {
+      "title": "Disease Outbreak News: Ebola disease caused by Bundibugyo virus- Democratic Republic of the Congo, Kenya and Nigeria (20 November 2026)",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/democratic-republic-congo/disease-outbreak-news-ebola-disease-caused-bundibugyo-virus-democratic-republic-congo-kenya-and-nigeria-20-november-2026",
+      "publishedAt": "2026-11-21T08:03:05.0000000+00:00",
+      "source": "ReliefWeb",
+      "publisher": "ReliefWeb",
+      "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": [
+        "Bas-Uele",
+        "Ituri",
+        "Nord-Kivu",
+        "Nord-Ubangi",
+        "Sud-Kivu",
+        "Sud-Ubangi",
+        "Tshopo"
+      ]
     },
     {
       "title": "Beating Ebola takes more than medicine - I saw what worked in west Africa a decade ago",
@@ -484,19 +505,6 @@ window.RDC_DAILY_UPDATES = {
       "category": "humanitarian",
       "language": "unknown",
       "rdcRelated": false,
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
-      "title": "Protecting health care during the Bundibugyo virus disease response in the eastern Democratic Republic of the Congo: operational guidance",
-      "titleFr": "Protéger les soins de santé pendant la riposte à la maladie à virus Bundibugyo dans l’est de la République démocratique du Congo : orientations opérationnelles",
-      "url": "https://reliefweb.int/report/democratic-republic-congo/protecting-health-care-during-bundibugyo-virus-disease-response-eastern-democratic-republic-congo-operational-guidance",
-      "publishedAt": "2026-11-09T11:36:35.0000000+00:00",
-      "source": "ReliefWeb",
-      "publisher": "ReliefWeb",
-      "category": "humanitarian",
-      "language": "en",
-      "rdcRelated": true,
       "epidemicRelated": true,
       "provinces": []
     }
