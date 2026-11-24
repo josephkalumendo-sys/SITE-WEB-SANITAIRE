@@ -1,6 +1,62 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-23T05:14:17.1234811+00:00",
+  "updatedAt": "2026-11-24T05:01:29.4896605+00:00",
   "items": [
+    {
+      "title": "Rwanda Population Movement 2025 - DREF Final Report MDRRW024",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/rwanda/rwanda-population-movement-2025-dref-final-report-mdrrw024",
+      "publishedAt": "2026-11-23T14:20:16.0000000+00:00",
+      "source": "ReliefWeb",
+      "publisher": "ReliefWeb",
+      "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": [
+        "Sud-Kivu"
+      ]
+    },
+    {
+      "title": "WHO chief pleads for peace in Ebola-hit DR Congo area",
+      "titleFr": null,
+      "url": "https://www.manilatimes.net/2026/11/23/world/americas-emea/who-chief-pleads-for-peace-in-ebola-hit-dr-congo-area/2475818",
+      "publishedAt": "2026-11-23T02:25:00.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Manila Times",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": []
+    },
+    {
+      "title": "WHO chief calls for peace amid heavy fighting in Ebola-hit DR Congo region",
+      "titleFr": null,
+      "url": "https://www.aljazeera.com/news/2026/11/23/who-chief-calls-for-peace-amid-heavy-fighting-in-ebola-hit-dr-congo-region",
+      "publishedAt": "2026-11-23T00:39:51.0000000+00:00",
+      "source": "GNews",
+      "publisher": "Al Jazeera",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": []
+    },
+    {
+      "title": "WHO chief calls for peace in Ebola-hit DR Congo",
+      "titleFr": null,
+      "url": "https://morningstaronline.co.uk/article/who-chief-calls-peace-ebola-hit-dr-congo",
+      "publishedAt": "2026-11-23T00:00:00.0000000+00:00",
+      "source": "GNews",
+      "publisher": "The Morning Star",
+      "category": "media",
+      "language": "en",
+      "rdcRelated": true,
+      "epidemicRelated": true,
+      "provinces": [
+        "Ituri"
+      ]
+    },
     {
       "title": "Strain-specific Ebola jab trials to start in DR Congo next week: WHO",
       "titleFr": null,
@@ -190,45 +246,6 @@ window.RDC_DAILY_UPDATES = {
       "provinces": []
     },
     {
-      "title": "DR Congo Ebola Crisis Deepens: Violence Hinders Aid, Remote Areas Hit Hard",
-      "titleFr": null,
-      "url": "https://www.lokmattimes.com/international/dr-congo-ebola-crisis-deepens-violence-hinders-aid-remote-areas-hit-hard-a001-w02/",
-      "publishedAt": "2026-11-16T01:17:00.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Lokmat Times",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
-      "title": "Africa CDC says Ebola outbreak in DR Congo ‘still not under control’",
-      "titleFr": null,
-      "url": "https://www.aljazeera.com/news/2026/11/15/africa-cdc-says-ebola-outbreak-in-dr-congo-still-not-under-control",
-      "publishedAt": "2026-11-15T20:07:06.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Al Jazeera",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
-      "title": "DR Congo: Ebola-awareness campaigns conducted at schools in Bunia",
-      "titleFr": null,
-      "url": "https://www.africanews.com/2026/11/15/dr-congo-ebola-awareness-campaigns-conducted-at-schools-in-bunia/",
-      "publishedAt": "2026-11-14T22:03:58.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Africanews",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
-    },
-    {
       "title": "DR Congo: Multi-country Bundibugyo Ebola Virus Disease Outbreak Situation Report No. 26 (2 – 8 November 2026)",
       "titleFr": "RDC : rapport de situation n° 26 sur l’épidémie de maladie à virus Bundibugyo dans plusieurs pays (du 2 au 8 novembre 2026)",
       "url": "https://reliefweb.int/report/democratic-republic-congo/multi-country-bundibugyo-ebola-virus-disease-outbreak-situation-report-no-26-2-8-november-2026",
@@ -305,21 +322,6 @@ window.RDC_DAILY_UPDATES = {
       ]
     },
     {
-      "title": "WHO Warns DR Congo Ebola Outbreak Remains 'Concerning' Amidst Escalating Violence",
-      "titleFr": null,
-      "url": "https://www.lokmattimes.com/health/who-warns-dr-congo-ebola-outbreak-remains-concerning-amidst-escalating-violence-a001-w02/",
-      "publishedAt": "2026-11-12T15:48:41.0000000+00:00",
-      "source": "GNews",
-      "publisher": "Lokmat Times",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": [
-        "Kinshasa"
-      ]
-    },
-    {
       "title": "DR Congo: MSF DRC Ebola: Persistent gaps between resources and action remain six months on",
       "titleFr": "Ebola en RDC : six mois après, des écarts persistants entre les ressources disponibles et l’action menée – MSF",
       "url": "https://reliefweb.int/report/democratic-republic-congo/msf-drc-ebola-persistent-gaps-between-resources-and-action-remain-six-months",
@@ -334,19 +336,6 @@ window.RDC_DAILY_UPDATES = {
         "Ituri",
         "Nord-Kivu"
       ]
-    },
-    {
-      "title": "MSF warns hundreds of millions missing from DRC Ebola funds",
-      "titleFr": null,
-      "url": "https://www.newsbytesapp.com/news/world/msf-warns-hundreds-of-millions-missing-from-drc-ebola-funds/tldr",
-      "publishedAt": "2026-11-12T13:07:51.0000000+00:00",
-      "source": "GNews",
-      "publisher": "NewsBytes",
-      "category": "media",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": []
     },
     {
       "title": "WHO Director-General's opening remarks at the Member State briefing on Ebola outbreak in the Democratic Republic of the Congo – 11 November 2026",
@@ -494,19 +483,6 @@ window.RDC_DAILY_UPDATES = {
       "rdcRelated": false,
       "epidemicRelated": true,
       "provinces": []
-    },
-    {
-      "title": "Uganda - Situation of Food Security and Nutrition Assessment (FSNA) in refugee settlements and Kampala 2026",
-      "titleFr": null,
-      "url": "https://reliefweb.int/report/uganda/uganda-situation-food-security-and-nutrition-assessment-fsna-refugee-settlements-and-kampala-2026",
-      "publishedAt": "2026-11-09T15:03:15.0000000+00:00",
-      "source": "ReliefWeb",
-      "publisher": "ReliefWeb",
-      "category": "humanitarian",
-      "language": "unknown",
-      "rdcRelated": false,
-      "epidemicRelated": true,
-      "provinces": []
     }
   ],
   "sources": [
@@ -523,7 +499,7 @@ window.RDC_DAILY_UPDATES = {
     {
       "name": "GNews",
       "state": "updated",
-      "message": "10 publications récentes trouvées."
+      "message": "7 publications récentes trouvées."
     },
     {
       "name": "NewsData.io",
