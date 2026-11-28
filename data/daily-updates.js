@@ -1,6 +1,45 @@
 window.RDC_DAILY_UPDATES = {
-  "updatedAt": "2026-11-27T05:02:16.3598173+00:00",
+  "updatedAt": "2026-11-28T04:56:44.8658107+00:00",
   "items": [
+    {
+      "title": "WHO AFRO Polio Eradication Programme Bulletin (Q2, 2026)",
+      "titleFr": null,
+      "url": "https://www.afro.who.int/publications/who-afro-polio-eradication-programme-bulletin-q2-2026",
+      "publishedAt": "2026-11-27T16:06:15.0000000+00:00",
+      "source": "OMS Afrique",
+      "publisher": "OMS Afrique",
+      "category": "official",
+      "language": "unknown",
+      "rdcRelated": false,
+      "epidemicRelated": true,
+      "provinces": []
+    },
+    {
+      "title": "World: Major new funding announced for Gavi’s malaria vaccine programme",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/world/major-new-funding-announced-gavis-malaria-vaccine-programme",
+      "publishedAt": "2026-11-27T09:33:06.0000000+00:00",
+      "source": "ReliefWeb",
+      "publisher": "ReliefWeb",
+      "category": "humanitarian",
+      "language": "unknown",
+      "rdcRelated": false,
+      "epidemicRelated": true,
+      "provinces": []
+    },
+    {
+      "title": "South Sudan Health Cluster Strategy 2027",
+      "titleFr": null,
+      "url": "https://reliefweb.int/report/south-sudan/south-sudan-health-cluster-strategy-2027",
+      "publishedAt": "2026-11-27T02:06:03.0000000+00:00",
+      "source": "ReliefWeb",
+      "publisher": "ReliefWeb",
+      "category": "humanitarian",
+      "language": "en",
+      "rdcRelated": false,
+      "epidemicRelated": true,
+      "provinces": []
+    },
     {
       "title": "Congo Ebola outbreak crosses 12,000 cases as fighting disrupts response",
       "titleFr": null,
@@ -433,45 +472,6 @@ window.RDC_DAILY_UPDATES = {
       ]
     },
     {
-      "title": "WHO Director-General's opening remarks at the Member State briefing on Ebola outbreak in the Democratic Republic of the Congo – 11 November 2026",
-      "titleFr": null,
-      "url": "https://reliefweb.int/report/democratic-republic-congo/who-director-generals-opening-remarks-member-state-briefing-ebola-outbreak-democratic-republic-congo-11-november-2026",
-      "publishedAt": "2026-11-12T04:09:55.0000000+00:00",
-      "source": "ReliefWeb",
-      "publisher": "ReliefWeb",
-      "category": "humanitarian",
-      "language": "en",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": [
-        "Tshopo"
-      ]
-    },
-    {
-      "title": "DR Congo: Activités d’éradication de la poliomyélite en République démocratique du Congo (IEP)– S44 - 2026, Mise à jour au 05 novembre 2026",
-      "titleFr": null,
-      "url": "https://reliefweb.int/report/democratic-republic-congo/activites-deradication-de-la-poliomyelite-en-republique-democratique-du-congo-iep-s44-2026-mise-jour-au-05-novembre-2026",
-      "publishedAt": "2026-11-12T01:07:05.0000000+00:00",
-      "source": "ReliefWeb",
-      "publisher": "ReliefWeb",
-      "category": "humanitarian",
-      "language": "unknown",
-      "rdcRelated": true,
-      "epidemicRelated": true,
-      "provinces": [
-        "Ituri",
-        "Kasaï-Central",
-        "Kwango",
-        "Kwilu",
-        "Lomami",
-        "Lualaba",
-        "Maniema",
-        "Sud-Kivu",
-        "Sud-Ubangi",
-        "Tanganyika"
-      ]
-    },
-    {
       "title": "BUNDIBUGYO VIRUS DISEASE OUTBREAK Democratic Republic of the Congo | Kenya | Nigeria - Weekly External Situation Report 26, Data as of 7 November 2026",
       "titleFr": "Épidémie de maladie à virus Bundibugyo : rapport de situation hebdomadaire externe n° 25 pour la RDC, le Kenya et le Nigéria, données au 7 novembre 2026",
       "url": "https://www.afro.who.int/countries/kenya/publication/bundibugyo-virus-disease-outbreak-democratic-republic-congo-kenya-nigeria-weekly-external-situation",
@@ -494,7 +494,7 @@ window.RDC_DAILY_UPDATES = {
     {
       "name": "OMS Afrique",
       "state": "updated",
-      "message": "3 publications récentes trouvées."
+      "message": "4 publications récentes trouvées."
     },
     {
       "name": "ReliefWeb",
